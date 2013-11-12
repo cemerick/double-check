@@ -1,6 +1,6 @@
 (ns simple-check.core
   (:require [simple-check.generators :as gen]
-            [simple-check.clojure-test :as ct]))
+            [simple-check.clojure-test.runtime :as ct]))
 
 (declare shrink-loop failure)
 
@@ -8,7 +8,7 @@
   [seed]
   (if seed
     [seed (gen/random seed)]
-    (let [non-nil-seed (System/currentTimeMillis)]
+    (let [non-nil-seed #+clj (#'ct/current-time-ms) #+cljs (ct/current-time-ms)]
       [non-nil-seed (gen/random non-nil-seed)])))
 
 (defn- complete
@@ -37,9 +37,9 @@
               result (:result result-map)
               args (:args result-map)]
           (cond
-            (instance? Throwable result) (failure
-                                           property result-map-rose
-                                           so-far size)
+            (instance? #+clj Throwable #+cljs js/Error result)
+            (failure property result-map-rose so-far size)
+
             result (do
                      (ct/report-trial property so-far num-tests)
                      (recur (inc so-far) rest-size-seq))
@@ -55,7 +55,7 @@
 (defn not-falsey-or-exception?
   "True if the value is not falsy or an exception"
   [value]
-  (and value (not (instance? Throwable value))))
+  (and value (not (instance? #+clj Throwable #+cljs js/Error value))))
 
 (defn- shrink-loop
   "Shrinking a value produces a sequence of smaller values of the same type.

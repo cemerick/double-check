@@ -1,5 +1,7 @@
 (ns simple-check.generators
-  (:import java.util.Random)
+  (:require [cemerick.pprng :as pprng]
+            clojure.string
+            [#+clj clojure.core #+cljs cljs.core :as lang])
   (:refer-clojure :exclude [int vector list hash-map map keyword
                             char boolean byte bytes sequence
                             not-empty]))
@@ -44,7 +46,7 @@
   children of the inner and outer trees."
   {:no-doc true}
   [[[inner-root inner-children] children]]
-  [inner-root (concat (clojure.core/map join-rose children)
+  [inner-root (concat (lang/map join-rose children)
                       inner-children)])
 
 (defn rose-root
@@ -69,7 +71,7 @@
   "Applies functions `f` to all values in the tree."
   {:no-doc true}
   [f [root children]]
-  [(f root) (clojure.core/map (partial rose-fmap f) children)])
+  [(f root) (lang/map (partial rose-fmap f) children)])
 
 (defn rose-bind
   "Takes a Rose tree (m) and a function (k) from
@@ -85,8 +87,8 @@
   Takes a list of roses, not a rose"
   {:no-doc true}
   [pred [root children]]
-  [root (clojure.core/map (partial rose-filter pred)
-                          (clojure.core/filter (comp pred rose-root) children))])
+  [root (lang/map (partial rose-filter pred)
+                          (filter (comp pred rose-root) children))])
 (defn rose-permutations
   "Create a seq of vectors, where each rose in turn, has been replaced
   by its children."
@@ -94,15 +96,15 @@
   [roses]
   (apply concat
          (for [[rose index]
-               (clojure.core/map clojure.core/vector roses (range))]
+               (lang/map lang/vector roses (range))]
            (for [child (rose-children rose)] (assoc roses index child)))))
 
 (defn zip-rose
   "Apply `f` to the sequence of Rose trees `roses`."
   {:no-doc true}
   [f roses]
-  [(apply f (clojure.core/map rose-root roses))
-   (clojure.core/map (partial zip-rose f)
+  [(apply f (lang/map rose-root roses))
+   (lang/map (partial zip-rose f)
                      (rose-permutations roses))])
 
 (defn remove-roses
@@ -116,8 +118,8 @@
   {:no-doc true}
   [f roses]
   (if (seq roses)
-    [(apply f (clojure.core/map rose-root roses))
-     (clojure.core/map (partial shrink-rose f) (remove-roses roses))]
+    [(apply f (lang/map rose-root roses))
+     (lang/map (partial shrink-rose f) (remove-roses roses))]
     [(f) []]))
 
 (defn collapse-rose
@@ -126,9 +128,9 @@
   tree."
   {:no-doc true}
   [[root children]]
-  [root (concat (clojure.core/map collapse-rose children)
-                (clojure.core/map collapse-rose
-                                  (clojure.core/mapcat rose-children children)))])
+  [root (concat (lang/map collapse-rose children)
+                (lang/map collapse-rose
+                                  (lang/mapcat rose-children children)))])
 
 (defn- make-stack
   [children stack]
@@ -242,8 +244,8 @@
 
 (defn random
   {:no-doc true}
-  ([] (Random.))
-  ([seed] (Random. seed)))
+  ([] (pprng/rng))
+  ([seed] (pprng/rng seed)))
 
 (defn make-size-range-seq
   {:no-doc true}
@@ -256,7 +258,7 @@
   ([generator max-size]
    (let [r (random)
          size-seq (make-size-range-seq max-size)]
-     (clojure.core/map (comp rose-root (partial call-gen generator r)) size-seq))))
+     (lang/map (comp rose-root (partial call-gen generator r)) size-seq))))
 
 (defn sample
   "Return a sequence of `num-samples` (default 10)
@@ -276,18 +278,18 @@
 
 (defn- shrink-int
   [integer]
-  (clojure.core/map (partial - integer) (halfs integer)))
+  (lang/map (partial - integer) (halfs integer)))
 
 (defn- int-rose-tree
   [value]
-  [value (clojure.core/map int-rose-tree (shrink-int value))])
+  [value (lang/map int-rose-tree (shrink-int value))])
 
 (defn- rand-range
-  [^Random rnd lower upper]
+  [rnd lower upper]
   (let [diff (Math/abs (long (- upper lower)))]
     (if (zero? diff)
       lower
-      (+ (.nextInt rnd (inc diff)) lower))))
+      (+ (pprng/int rnd (inc diff)) lower))))
 
 (defn sized
   "Create a generator that depends on the size parameter.
@@ -314,11 +316,11 @@
   `min-range` to `max-range`, inclusive."
   [lower upper]
   (make-gen
-    (fn [^Random rnd _size]
+    (fn [rnd _size]
       (let [value (rand-range rnd lower upper)]
         (rose-filter
           #(and (>= % lower) (<= % upper))
-          [value (clojure.core/map int-rose-tree (shrink-int value))])))))
+          [value (lang/map int-rose-tree (shrink-int value))])))))
 
 (defn one-of
   "Create a generator that randomly chooses a value from the list of
@@ -351,7 +353,7 @@
       (gen/frequency [[5 gen/int] [3 (gen/vector gen/int)] [2 gen/boolean]])
   "
   [pairs]
-  (let [total (apply + (clojure.core/map first pairs))]
+  (let [total (apply + (lang/map first pairs))]
     (gen-bind (choose 1 total)
               #(pick pairs (rose-root %)))))
 
@@ -397,7 +399,7 @@
       ;; generate a vector of booleans, but never the empty vector
       (gen/not-empty (gen/vector gen/boolean))
   "
-  (partial such-that clojure.core/not-empty))
+  (partial such-that lang/not-empty))
 
 (defn no-shrink
   "Create a new generator that is just like `gen`, except does not shrink
@@ -434,7 +436,7 @@
   [& generators]
   (gen-bind (sequence gen-bind gen-pure generators)
             (fn [roses]
-              (gen-pure (zip-rose clojure.core/vector roses)))))
+              (gen-pure (zip-rose lang/vector roses)))))
 
 (def int
   "Generates a positive or negative integer bounded by the generator's
@@ -475,7 +477,7 @@
                            (repeat (rose-root num-elements-rose)
                                    generator))
                  (fn [roses]
-                   (gen-pure (shrink-rose clojure.core/vector
+                   (gen-pure (shrink-rose lang/vector
                                           roses)))))))
   ([generator num-elements]
    (apply tuple (repeat num-elements generator)))
@@ -488,7 +490,7 @@
                                    generator))
                  (fn [roses]
                    (gen-bind
-                     (gen-pure (shrink-rose clojure.core/vector
+                     (gen-pure (shrink-rose lang/vector
                                             roses))
                      (fn [rose]
                        (gen-pure (rose-filter
@@ -504,16 +506,18 @@
                                   (repeat (rose-root num-elements-rose)
                                           generator))
                         (fn [roses]
-                          (gen-pure (shrink-rose clojure.core/list
+                          (gen-pure (shrink-rose lang/list
                                                  roses)))))))
 
+#+clj
 (def byte
   "Generates `java.lang.Byte`s, using the full byte-range."
-  (fmap clojure.core/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
+  (fmap lang/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
 
+#+clj
 (def bytes
   "Generates byte-arrays."
-  (fmap clojure.core/byte-array (vector byte)))
+  (fmap lang/byte-array (vector byte)))
 
 (defn map
   "Create a generator that generates maps, with keys chosen from
@@ -523,7 +527,7 @@
     (fmap (partial into {}) input)))
 
 (defn hash-map
-  "Like clojure.core/hash-map, except the values are generators.
+  "Like clojure.lang/hash-map, except the values are generators.
    Returns a generator that makes maps with the supplied keys and
    values generated using the supplied generators.
 
@@ -540,15 +544,15 @@
 
 (def char
   "Generates character from 0-255."
-  (fmap clojure.core/char (choose 0 255)))
+  (fmap lang/char (choose 0 255)))
 
 (def char-ascii
   "Generate only ascii character."
-  (fmap clojure.core/char (choose 32 126)))
+  (fmap lang/char (choose 32 126)))
 
 (def char-alpha-numeric
   "Generate alpha-numeric characters."
-  (fmap clojure.core/char
+  (fmap lang/char
         (one-of [(choose 48 57)
                  (choose 65 90)
                  (choose 97 122)])))
@@ -569,8 +573,9 @@
   "Generate keywords."
   (->> string-alpha-numeric
     (such-that #(not= "" %))
-    (fmap clojure.core/keyword)))
+    (fmap lang/keyword)))
 
+#+clj
 (def ratio
   "Generates a `clojure.lang.Ratio`. Shrinks toward 0. Not all values generated
   will be ratios, as many values returned by `/` are not ratios."
@@ -580,10 +585,10 @@
            (such-that (complement zero?) int))))
 
 (def simple-type
-  (one-of [int char string ratio boolean keyword]))
+  (one-of [int char string #+clj ratio boolean keyword]))
 
 (def simple-type-printable
-  (one-of [int char-ascii string-ascii ratio boolean keyword]))
+  (one-of [int char-ascii string-ascii #+clj ratio boolean keyword]))
 
 (defn container-type
   [inner-type]
