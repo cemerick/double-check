@@ -40,7 +40,5 @@
                                :builds [{:source-paths ["target/classes" "target/test-classes"]
                                          :compiler {:output-to "target/testable.js"
                                                     :libs [""]
-                                                    ;;:source-maps "target/sourcemap.js"
-                                                    ;; `lein cleantest` fails
-                                                    ;; under :advanced :-(
-                                                    :optimizations :simple}}]}}})
+                                                    :source-map "target/testable.js.map"
+                                                    :optimizations :advanced}}]}}})
