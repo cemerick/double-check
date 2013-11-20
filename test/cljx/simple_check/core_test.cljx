@@ -413,14 +413,14 @@
             (gen/tuple gen/int gen/int)))
 
 (defspec choose-respects-bounds-during-shrinking 100
-  (prop/for-all [[mini maxi] range-gen
-                 random-seed gen/nat
-                 size gen/nat]
-                (let [tree (gen/call-gen
-                             (gen/choose mini maxi)
-                             (gen/random random-seed)
-                             size)]
-                  (every?
-                    #(and (<= mini %) (>= maxi %))
-                    (gen/rose-seq tree)))))
+  (for-all [[mini maxi] range-gen
+            random-seed gen/nat
+            size gen/nat]
+           (let [tree (gen/call-gen
+                       (gen/choose mini maxi)
+                       (gen/random random-seed)
+                       size)]
+             (every?
+              #(and (<= mini %) (>= maxi %))
+              (gen/rose-seq tree)))))
 
