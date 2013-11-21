@@ -36,6 +36,9 @@ simple-check, though it is based upon and tracks it.  i.e. you should not expect
 to be able to move from simple-check to double-check (or vice versa) in a
 Clojure project with no changes.  None are known to be required right now, but
 that _may_ change to maximize runtime target portability.
+5. ...retains the `simple-check.*` namespace structure, despite the name of this
+repo. This is to make tracking easier, and to allow users to share/port examples
+and usage of each package back and forth with a minimum of pain.
 
 A word on versioning: `[com.cemerick/double-check]` version numbers will track
 simple-check version numbers as well, using a suffixed classifier (e.g. 0.1.2
@@ -92,9 +95,12 @@ equivalent to applying it once: `(= (sort a) (sort (sort a)))`. Let's write a
 quick test to make sure this is the case:
 
 ```clojure
-(require '[simple-check.core :as sc])
-(require '[simple-check.generators :as gen])
-(require '[simple-check.properties :as prop])
+(ns double-check.demos
+  (:require [simple-check.core :as sc]
+            [simple-check.generators :as gen]
+            [simple-check.properties :as prop]))
+; in ClojureScript, the last :require would be replaced with:
+; (:require-macros [simple-check.properties :as prop])
 
 (def sort-idempotent-prop
   (prop/for-all [v (gen/vector gen/int)]
@@ -155,8 +161,10 @@ To learn more, check out the [documentation](#documentation) links.
 
 ### `clojure.test` Integration
 
-There is a macro called `defspec` that allows you to succinctly write
-properties that run under the `clojure.test` runner, for example:
+The `simple-check.clojure-test/defspec` macro allows you to succinctly write
+properties that run under `clojure.test` (or
+[clojurescript.test](http://github.com/cemerick/clojurescript.test), as
+appropriate).  For example:
 
 ```clojure
 (defspec first-element-is-min-after-sorting ;; the name of the test
@@ -166,7 +174,12 @@ properties that run under the `clojure.test` runner, for example:
               (first (sorted v)))))
 ```
 
-See more examples in [`core_test.clj`](test/simple_check/core_test.clj).
+This defines a standard clojure.test / clojurescript.test test, which can be
+invoked directly to run only it.  Or, you can run all of the tests in a
+namespace or the entire environment with the `test-ns` and `run-all-tests`
+utility functions in clojure.test and clojurescript.test.
+
+See more examples in [`core_test.clj`](test/cljx/simple_check/core_test.cljx).
 
 ## Release Notes
 
