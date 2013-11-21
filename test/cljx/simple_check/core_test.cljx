@@ -366,6 +366,7 @@
   [value]
   (= value (-> value prn-str read-string)))
 
+#+clj ; TODO clojure-only here until http://dev.clojure.org/jira/browse/CLJS-677
 (defspec edn-roundtrips 50
   (for-all [a gen/any]
            (edn-roundtrip? a)))
