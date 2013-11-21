@@ -31,23 +31,38 @@ simple-check.  In particular, the core abstractions and generator/shrinking
 implementation defined in simple-check are considered canonical.  If
 simple-check eventually provides equivalent functionality for the ClojureScript
 side of the house, this project will be shuttered.
-4. ...while based on and tracking simple-check, does not make any guarantees
-about 100% API compatibility with it; i.e. you should not expect to be able to
-move from simple-check to double-check (or vice versa) in a Clojure project with
-no changes.  None are known to be required right now, but that _may_ change to
-maximize runtime target portability.
+4. ...does not make any guarantees about 100% API compatibility with
+simple-check, though it is based upon and tracks it.  i.e. you should not expect
+to be able to move from simple-check to double-check (or vice versa) in a
+Clojure project with no changes.  None are known to be required right now, but
+that _may_ change to maximize runtime target portability.
 
 A word on versioning: `[com.cemerick/double-check]` version numbers will track
 simple-check version numbers as well, using a suffixed classifier (e.g. 0.1.2
-turns into 0.1.2-1) to indicate local changes. 
+turns into 0.1.2-1) to indicate local changes.  `SNAPSHOT` version numbers will
+be the same as simple-check's.
 
 ## Installation
 
 ### Leiningen
 
+Add this to your `:dependencies`:
+
 ```clojure
 [com.cemerick/double-check "0.5.4-SNAPSHOT"]
 ```
+
+...and make sure you add this to your
+[cljsbuild](https://github.com/emezeske/lein-cljsbuild) `:compiler` options:
+
+```clojure
+:libs [""]
+```
+
+(This is temporary workaround will bring in the JavaScript portion of the
+[portable random number generator](http://github.com/cemerick/pprng) for your
+ClojureScript builds; this will be necessary until
+[CLJS-656](http://dev.clojure.org/jira/browse/CLJS-656) is resolved.)
 
 ### Maven
 
