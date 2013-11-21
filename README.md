@@ -1,27 +1,61 @@
-# simple-check
+# double-check [![Build Status](https://secure.travis-ci.org/cemerick/double-check.png)](http://travis-ci.org/cemerick/double-check)
 
+__double-check__ is a fork of [@reiddraper](http://github.com/reiddraper)'s
+[simple-check](https://github.com/reiddraper/simple-check), a property-based
+testing tool inspired by QuickCheck.  The core idea of simple-check (and thus, __double-check__) is that instead of
+enumerating expected input and output for unit tests, you write properties about
+your function that should hold true for all inputs. This lets you write concise,
+powerful tests.
 
-__simple-check__ is a Clojure property-based testing tool inspired by QuickCheck.
-The core idea of __simple-check__ is that instead of enumerating
-expected input and output for unit tests, you write properties about your
-function that should hold true for all inputs. This lets you write concise, powerful
-tests.
+## Why a fork?
+
+While simple-check is dedicated to remaining a Clojure-only API (at least for
+now?) __double-check__ is written using
+[cljx](http://github.com/keminglabs/cljx), and thus provides an API that is
+portable between Clojure and ClojureScript.  _This approach has already
+uncovered significant bugs in ClojureScript itself, and can do the same for your
+programs._
+
+Please note that this fork:
+
+1. ...always tracks simple-check as closely as possible, with the only divergences
+being those necessary to ensure an API portable between Clojure and
+ClojureScript.
+2. ...is not a rewrite.  The move to cljx yields minimal changes compared to the
+simple-check baseline; 100% of the core logic flows from it.  There's nothing
+novel here.
+3. ...is not hostile in any way to simple-check, @reiddraper, etc.  It exists
+solely to make it possible to apply simple-check's testing approach to
+ClojureScript libraries and applications, not to supplant or compete with
+simple-check.  In particular, the core abstractions and generator/shrinking
+implementation defined in simple-check are considered canonical.  If
+simple-check eventually provides equivalent functionality for the ClojureScript
+side of the house, this project will be shuttered.
+4. ...while based on and tracking simple-check, does not make any guarantees
+about 100% API compatibility with it; i.e. you should not expect to be able to
+move from simple-check to double-check (or vice versa) in a Clojure project with
+no changes.  None are known to be required right now, but that _may_ change to
+maximize runtime target portability.
+
+A word on versioning: `[com.cemerick/double-check]` version numbers will track
+simple-check version numbers as well, using a suffixed classifier (e.g. 0.1.2
+turns into 0.1.2-1) to indicate local changes. 
 
 ## Installation
 
 ### Leiningen
 
 ```clojure
-[reiddraper/simple-check "0.5.3"]
+[com.cemerick/double-check "0.5.4-SNAPSHOT"]
 ```
 
 ### Maven
 
 ```xml
 <dependency>
-  <groupId>reiddraper</groupId>
-  <artifactId>simple-check</artifactId>
-  <version>0.5.3</version>
+  <groupId>com.cemerick</groupId>
+  <artifactId>double-check</artifactId>
+  <version>0.5.4-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -119,10 +153,6 @@ properties that run under the `clojure.test` runner, for example:
 
 See more examples in [`core_test.clj`](test/simple_check/core_test.clj).
 
-## Build Status
-
-[![Build Status](https://secure.travis-ci.org/reiddraper/simple-check.png)](http://travis-ci.org/reiddraper/simple-check)
-
 ## Release Notes
 
 Release notes for each version are available in [`CHANGELOG.markdown`](CHANGELOG.markdown).
@@ -142,6 +172,6 @@ Release notes for each version are available in [`CHANGELOG.markdown`](CHANGELOG
 
 ## License
 
-Copyright © 2013 Reid Draper
+Copyright © 2013 Reid Draper and other contributors
 
 Distributed under the Eclipse Public License, the same as Clojure.
