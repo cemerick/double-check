@@ -68,7 +68,7 @@
   [m]
   (let [t (current-time-ms)]
     (when (> (- t *trial-report-period*) @last-trial-report)
-      (with-test-out
+      (with-test-out #+cljs (:test-env m)
         (println "Passing trial" (-> m ::trial first) "/" (-> m ::trial second)
                  "for" (get-property-name m)))
       (reset! last-trial-report t))))
@@ -92,7 +92,7 @@
 
 (defmethod ct-report ::shrinking [m]
   (when *report-shrinking*
-    (with-test-out
+    (with-test-out #+cljs (:test-env m)
       (println "Shrinking" (get-property-name m)
                "starting with parameters" (pr-str (::params m))))))
 

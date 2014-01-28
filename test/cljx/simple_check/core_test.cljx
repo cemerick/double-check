@@ -8,7 +8,8 @@
             #+cljs [cljs.reader :refer (read-string)])
   #+cljs (:require-macros [simple-check.clojure-test :refer (defspec)]
                           [simple-check.properties :refer (for-all)]
-                          [cemerick.cljs.test :refer (is testing deftest test-var)]))
+                          [cemerick.cljs.test :refer (is testing deftest test-var
+                                                         run-tests)]))
 
 ;; plus and 0 form a monoid
 ;; ---------------------------------------------------------------------------

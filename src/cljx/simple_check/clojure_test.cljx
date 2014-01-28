@@ -26,8 +26,11 @@
                                       times#
                                       (vary-meta ~property assoc :name (str '~property))
                                       (flatten (seq quick-check-opts#)))))
-              ~test-fn (fn [] (~(maybe-var (:ns &env) 'simple-check.clojure-test.runtime/assert-check)
-                                (assoc (~entry-sym) :test-var (str '~name))))]
+              ~test-fn (fn [& [test-ctx#]]
+                         (~(if (:ns &env) 'cemerick.cljs.test/with-test-ctx 'do)
+                          test-ctx#
+                          (~(maybe-var (:ns &env) 'simple-check.clojure-test.runtime/assert-check)
+                           (assoc (~entry-sym) :test-var (str '~name)))))]
           (do
             ; :declared metadata eliminates clojurescript warnings re: a fn
             ; defined without defn not statically a fn
@@ -40,7 +43,10 @@
             ~(when (:ns &env)
               ; not having cljs, cljs.test around as a regular dependency hurts here some :-P
               `(cemerick.cljs.test/register-test! '~(eval 'cljs.analyzer/*cljs-ns*)
-                                                 ~((eval '(var cemerick.cljs.test/munged-symbol))
-                                                   (eval 'cljs.analyzer/*cljs-ns*) "." name)))
+                                                  ~(->> [(eval 'cljs.analyzer/*cljs-ns*) name]
+                                                        (map str)
+                                                        (apply symbol))
+                                                  ~((eval '(var cemerick.cljs.test/munged-symbol))
+                                                    (eval 'cljs.analyzer/*cljs-ns*) "." name)))
             ~(maybe-var (:ns &env) name))))))
 

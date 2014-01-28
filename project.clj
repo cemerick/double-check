@@ -12,11 +12,12 @@
   :codox {:writer codox-md.writer/write-docs}
   :plugins [[codox "0.6.4"]]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2014"]
+  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2138"]
+[org.clojure/tools.reader "0.8.3"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
-                   :plugins [[com.keminglabs/cljx "0.3.2-SNAPSHOT"]
-                             [lein-cljsbuild "1.0.0"]
-                             [com.cemerick/clojurescript.test "0.2.1"]
+                   :plugins [[com.keminglabs/cljx "0.3.2"]
+                             [lein-cljsbuild "1.0.1"]
+                             [com.cemerick/clojurescript.test "0.3.0-SNAPSHOT"]
                              [com.cemerick/austin "0.1.3"]]
                    :cljx {:builds [{:source-paths ["src/cljx"]
                                     :output-path "target/classes"
