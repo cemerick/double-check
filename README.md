@@ -24,10 +24,12 @@ ClojureScript.
 2. ...is not a rewrite.  The move to cljx yields minimal changes compared to the
 simple-check baseline; 100% of the core logic flows from it.  There's nothing
 novel here.
-3. ...is not hostile in any way to simple-check, @reiddraper, etc.  It exists
-solely to make it possible to apply simple-check's testing approach to
-ClojureScript libraries and applications, not to supplant or compete with
-simple-check.  In particular, the core abstractions and generator/shrinking
+3. ...is not hostile in any way to simple-check, @reiddraper, etc.  (It's
+actually
+[@reiddraper-approved](https://github.com/reiddraper/simple-check/issues/11#issuecomment-31963517)!
+:-P) It exists solely to make it possible to apply simple-check's testing
+approach to ClojureScript libraries and applications, not to supplant or compete
+with simple-check.  In particular, the core abstractions and generator/shrinking
 implementation defined in simple-check are considered canonical.  If
 simple-check eventually provides equivalent functionality for the ClojureScript
 side of the house, this project will be shuttered.
@@ -71,15 +73,9 @@ ClojureScript builds; this will be necessary until
 
 ```xml
 <dependency>
-<<<<<<< HEAD
   <groupId>com.cemerick</groupId>
   <artifactId>double-check</artifactId>
-  <version>0.5.4-SNAPSHOT</version>
-=======
-  <groupId>reiddraper</groupId>
-  <artifactId>simple-check</artifactId>
-  <version>0.5.5</version>
->>>>>>> simple-check/master
+  <version>0.5.6-SNAPSHOT</version>
 </dependency>
 ```
 
