@@ -26,8 +26,8 @@
           ms))
 
 (defn- exclude-nth
-  [n coll]
   "Exclude the nth value in a collection."
+  [n coll]
   (lazy-seq
     (when-let [s (seq coll)]
       (if (zero? n)
@@ -143,7 +143,7 @@
   This assumes that two nodes with the same value have the same children.
   While it's not common, it's possible to create trees that don't
   fit that description. This function is significantly faster than
-  brute-force unumerating all of the nodes in a tree, as there will
+  brute-force enumerating all of the nodes in a tree, as there will
   be many duplicates."
   [root]
   (let [helper (fn helper [[node children] seen stack]
@@ -284,12 +284,12 @@
   [value]
   [value (lang/map int-rose-tree (shrink-int value))])
 
-(defn- rand-range
+(defn rand-range
   [rnd lower upper]
-  (let [diff (Math/abs (long (- upper lower)))]
-    (if (zero? diff)
-      lower
-      (+ (pprng/int rnd (inc diff)) lower))))
+  {:pre [(<= lower upper)]}
+  (let [factor (pprng/double rnd)]
+    (long (Math/floor (+ lower (- (* factor (+ 1.0 upper))
+                                  (* factor lower)))))))
 
 (defn sized
   "Create a generator that depends on the size parameter.
@@ -521,7 +521,7 @@
 
 (defn map
   "Create a generator that generates maps, with keys chosen from
-  `ken-gen` and values chosen from `val-gen`."
+  `key-gen` and values chosen from `val-gen`."
   [key-gen val-gen]
   (let [input (vector (tuple key-gen val-gen))]
     (fmap (partial into {}) input)))

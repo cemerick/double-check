@@ -1,4 +1,4 @@
-(defproject com.cemerick/double-check "0.5.4-SNAPSHOT"
+(defproject com.cemerick/double-check "0.5.6-SNAPSHOT"
   :description "A QuickCheck inspired property-based testing library."
   :url "http://github.com/cemerick/double-check"
   :license {:name "Eclipse Public License"
@@ -12,8 +12,7 @@
   :codox {:writer codox-md.writer/write-docs}
   :plugins [[codox "0.6.4"]]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2138"]
-[org.clojure/tools.reader "0.8.3"]
+  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2156"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
                    :plugins [[com.keminglabs/cljx "0.3.2"]
                              [lein-cljsbuild "1.0.1"]
@@ -37,9 +36,11 @@
 
                    :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]}
 
-                   :cljsbuild {:test-commands {"phantom" ["phantomjs" :runner "target/testable.js"]}
+                   :cljsbuild {:test-commands {"phantom" ["phantomjs" :runner "target/testable.js"]
+                                               "node" ["node" :node-runner "target/testable.js"]}
                                :builds [{:source-paths ["target/classes" "target/test-classes"]
                                          :compiler {:output-to "target/testable.js"
                                                     :libs [""]
-                                                    :source-map "target/testable.js.map"
+                                                    ; node doesn't like source maps I guess?
+                                                    ;:source-map "target/testable.js.map"
                                                     :optimizations :advanced}}]}}})

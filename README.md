@@ -52,7 +52,7 @@ be the same as simple-check's.
 Add this to your `:dependencies`:
 
 ```clojure
-[com.cemerick/double-check "0.5.4-SNAPSHOT"]
+[com.cemerick/double-check "0.5.6-SNAPSHOT"]
 ```
 
 ...and make sure you add this to your
@@ -71,9 +71,15 @@ ClojureScript builds; this will be necessary until
 
 ```xml
 <dependency>
+<<<<<<< HEAD
   <groupId>com.cemerick</groupId>
   <artifactId>double-check</artifactId>
   <version>0.5.4-SNAPSHOT</version>
+=======
+  <groupId>reiddraper</groupId>
+  <artifactId>simple-check</artifactId>
+  <version>0.5.5</version>
+>>>>>>> simple-check/master
 </dependency>
 ```
 
@@ -86,6 +92,11 @@ ClojureScript builds; this will be necessary until
     * [byte-streams](https://github.com/ztellman/byte-streams/blob/b5f50a20c6237ae4e45046f72367ad658090c591/test/byte_streams_simple_check.clj)
     * [byte-transforms](https://github.com/ztellman/byte-transforms/blob/c5b9613eebac722447593530531b9aa7976a0592/test/byte_transforms_simple_check.clj)
     * [collection-check](https://github.com/ztellman/collection-check)
+  * Blog posts and videos:
+    * [Check your work - 8th Light](http://blog.8thlight.com/connor-mendenhall/2013/10/31/check-your-work.html)
+    * [Writing simple-check - Reid Draper](http://reiddraper.com/writing-simple-check/)
+    * [Generative testing in Clojure - Youtube](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
+    * [Using simple-check with Expectations - Curtis Gagliardi](http://curtis.io/posts/2013-12-28-using-simple-check-with-expectations.html)
 
 ## Examples
 

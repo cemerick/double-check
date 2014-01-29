@@ -107,10 +107,11 @@
 
 (defn interpose-twice-the-length ;; (or one less)
   [v]
-  (let [interpose-count (count (interpose :i v))]
+  (let [interpose-count (count (interpose :i v))
+        original-count (count v)]
     (or
-      (= (* 2 interpose-count))
-      (= (dec (* 2 interpose-count))))))
+      (= (* 2 original-count) interpose-count)
+      (= (dec (* 2 original-count)) interpose-count))))
 
 
 (deftest interpose-creates-sequence-twice-the-length
@@ -118,7 +119,8 @@
     "Interposing a collection with a value makes it's count
     twice the original collection, or ones less."
     (is (:result
-          (sc/quick-check 1000 (prop/for-all* [(gen/vector gen/int)] interpose-twice-the-length))))))
+         (sc/quick-check 1000 (for-all [v (gen/vector gen/int)]
+                                       (interpose-twice-the-length v)))))))
 
 ;; Lists and vectors are equivalent with seq abstraction
 ;; ---------------------------------------------------------------------------
@@ -426,3 +428,58 @@
               #(and (<= mini %) (>= maxi %))
               (gen/rose-seq tree)))))
 
+
+;; rand-range copes with full range of longs as bounds
+;; ---------------------------------------------------------------------------
+
+(def ^:private long-range
+  #+clj [Long/MIN_VALUE Long/MAX_VALUE]
+  #+cljs [-9007199254740992 9007199254740992])
+
+(def ^:private int-range [-2147483648 2147483647])
+
+(deftest rand-range-copes-with-full-range-of-longs
+  (let [[low high] (reduce
+                    (fn [[low high :as margins] x]
+                      (cond
+                       (< x low) [x high]
+                       (> x high) [low x]
+                       :else margins))
+                    (reverse long-range)
+                    ; choose uses rand-range directly, reasonable proxy for its
+                    ; guarantees
+                    (take 1e6 (gen/sample-seq (apply gen/choose long-range))))]
+    (is (< low high))
+    (is (< low (first int-range)))
+    (is (> high (second int-range)))))
+
+;; rand-range yields values inclusive of both lower & upper bounds provided to it
+;; further, that generators that use rand-range use its full range of values
+;; ---------------------------------------------------------------------------
+
+(deftest rand-range-uses-inclusive-bounds
+  (let [bounds [5 7]
+        rand-range (apply partial gen/rand-range (gen/random) bounds)]
+    (loop [trials 0
+           bounds (set bounds)]
+      (cond
+       (== trials 10000)
+       (is nil (str "rand-range didn't return both of its bounds after 10000 trials; "
+                    "it is possible for this to fail without there being a problem, "
+                    "but we should be able to rely upon probability to not bother us "
+                    "too frequently."))
+       (empty? bounds) (is true)
+       :else (recur (inc trials) (disj bounds (rand-range)))))))
+
+(deftest elements-generates-all-provided-values
+  (let [options [:a 42 'c/d "foo"]]
+    (is (->> (reductions
+                 disj
+                 (set options)
+                 (gen/sample-seq (gen/elements options)))
+             (take 10000)
+             (some empty?))
+        (str "elements didn't return all of its candidate values after 10000 trials; "
+             "it is possible for this to fail without there being a problem, "
+             "but we should be able to rely upon probability to not bother us "
+             "too frequently."))))
