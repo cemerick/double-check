@@ -30,9 +30,8 @@
 
 (#+clj defn #+cljs deftesthook test-ns-hook
   [& [test-env]]
-  ; pain due to fuzziness in clojurescript.test between test environments and
-  ; test contexts
-  (#+cljs with-test-ctx #+clj do {:state test-env :test-name 'this-api-is-busted}
+  (#+cljs with-test-ctx #+clj do
+          #+cljs (t/TestContext. test-env 'clojure-test-test-hook)
     (is (= {:test-var 'trial-counts, :result true, :num-tests 5000}
            (-> (with-out-str
                  (binding #+clj [*test-out* *out*] #+cljs []
