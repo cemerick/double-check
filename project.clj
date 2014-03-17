@@ -1,4 +1,4 @@
-(defproject com.cemerick/double-check "0.5.6-SNAPSHOT"
+(defproject reiddraper/simple-check "0.5.6"
   :description "A QuickCheck inspired property-based testing library."
   :url "http://github.com/cemerick/double-check"
   :license {:name "Eclipse Public License"
