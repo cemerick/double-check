@@ -7,9 +7,9 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns simple-check.core
-  (:require [simple-check.generators :as gen]
-            [simple-check.clojure-test.runtime :as ct]))
+(ns cemerick.double-check
+  (:require [cemerick.double-check.generators :as gen]
+            [cemerick.double-check.clojure-test.runtime :as ct]))
 
 (declare shrink-loop failure)
 

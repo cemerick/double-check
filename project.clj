@@ -1,4 +1,4 @@
-(defproject org.clojure/test.check "0.5.8-SNAPSHOT"
+(defproject com.cemerick/double-check "0.5.8-SNAPSHOT"
   :description "A QuickCheck inspired property-based testing library."
   :url "http://github.com/cemerick/double-check"
   :license {:name "Eclipse Public License"
@@ -8,16 +8,15 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [com.cemerick/pprng "0.0.2"]]
   :jar-exclusions [#"\.cljx"]
-  :global-vars {*warn-on-reflection* true}
   :codox {:writer codox-md.writer/write-docs}
   :plugins [[codox "0.6.4"]]
 
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2156"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
-                   :plugins [[com.keminglabs/cljx "0.3.2"]
+                   :plugins [[com.keminglabs/cljx "0.3.3-SNAPSHOT"]
                              [lein-cljsbuild "1.0.1"]
                              [com.cemerick/clojurescript.test "0.3.0-SNAPSHOT"]
-                             [com.cemerick/austin "0.1.3"]]
+                             [com.cemerick/austin "0.1.4"]]
                    :cljx {:builds [{:source-paths ["src/cljx"]
                                     :output-path "target/classes"
                                     :rules :clj}

@@ -6,8 +6,9 @@
 ;   By using this software in any fashion, you are agreeing to be bound by
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
-(ns simple-check.clojure-test
-  (:require simple-check.core))
+
+(ns cemerick.double-check.clojure-test
+  (:require cemerick.double-check))
 
 (def ^:dynamic *default-test-count* 100)
 
@@ -30,14 +31,14 @@
        `(let [~entry-sym (fn ~entry-sym
                             ([] (~entry-sym (or ~default-times *default-test-count*)))
                             ([times# & {:keys [seed# max-size#] :as quick-check-opts#}]
-                               (apply simple-check.core/quick-check
+                               (apply cemerick.double-check/quick-check
                                       times#
                                       (vary-meta ~property assoc :name (str '~property))
                                       (flatten (seq quick-check-opts#)))))
               ~test-fn (fn [& [test-ctx#]]
                          (~(if (:ns &env) 'cemerick.cljs.test/with-test-ctx 'do)
                           test-ctx#
-                          (~(maybe-var (:ns &env) 'simple-check.clojure-test.runtime/assert-check)
+                          (~(maybe-var (:ns &env) 'cemerick.double-check.clojure-test.runtime/assert-check)
                            (assoc (~entry-sym) :test-var (str '~name)))))]
           (do
             ; :declared metadata eliminates clojurescript warnings re: a fn

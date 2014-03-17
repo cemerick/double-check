@@ -7,8 +7,8 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns simple-check.properties
-  (:require [simple-check.generators :as gen]))
+(ns cemerick.double-check.properties
+  (:require [cemerick.double-check.generators :as gen]))
 
 ;; NOTES:
 ;; The fields that should be returned from each test

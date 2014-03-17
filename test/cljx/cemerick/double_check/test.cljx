@@ -7,16 +7,16 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns simple-check.core-test
-  (:require [simple-check.core       :as sc]
-            [simple-check.generators :as gen]
-            [simple-check.properties :as prop :refer (#+clj for-all)]
-            [simple-check.clojure-test.runtime :as ct]
-            #+clj [simple-check.clojure-test :refer (defspec)]
+(ns cemerick.double-check.test
+  (:require [cemerick.double-check       :as sc]
+            [cemerick.double-check.generators :as gen]
+            [cemerick.double-check.properties :as prop :refer (#+clj for-all)]
+            [cemerick.double-check.clojure-test.runtime :as ct]
+            #+clj [cemerick.double-check.clojure-test :refer (defspec)]
             #+clj [clojure.test :refer (is testing deftest test-var)]
             #+cljs [cljs.reader :refer (read-string)])
-  #+cljs (:require-macros [simple-check.clojure-test :refer (defspec)]
-                          [simple-check.properties :refer (for-all)]
+  #+cljs (:require-macros [cemerick.double-check.clojure-test :refer (defspec)]
+                          [cemerick.double-check.properties :refer (for-all)]
                           [cemerick.cljs.test :refer (is testing deftest test-var
                                                          run-tests)]))
 
@@ -137,7 +137,7 @@
 (defn list-vector-round-trip-equiv
   [a]
   ;; NOTE: can't use `(into '() ...)` here because that
-  ;; puts the list in reverse order. simple-check found that bug
+  ;; puts the list in reverse order. cemerick.double-check found that bug
   ;; pretty quickly...
   (= a (apply list (vec a))))
 

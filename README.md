@@ -1,15 +1,17 @@
 # double-check [![Build Status](https://secure.travis-ci.org/cemerick/double-check.png)](http://travis-ci.org/cemerick/double-check)
 
 __double-check__ is a fork of [@reiddraper](http://github.com/reiddraper)'s
-[simple-check](https://github.com/reiddraper/simple-check), a property-based
-testing tool inspired by QuickCheck.  The core idea of simple-check (and thus,
-__double-check__) is that instead of enumerating expected input and output for
-unit tests, you write properties about your function that should hold true for
-all inputs. This lets you write concise, powerful tests.
+[test.check](https://github.com/clojure/test.check) (née
+[simple-check](https://github.com/reiddraper/simple-check)) library, a
+property-based testing tool inspired by QuickCheck.  The core idea of
+test.check (and thus, __double-check__) is that instead of enumerating
+expected input and output for unit tests, you write properties about your
+function that should hold true for all inputs. This lets you write concise,
+powerful tests.
 
 ## Why a fork?
 
-While simple-check is dedicated to remaining a Clojure-only API (at least for
+While test.check is dedicated to remaining a Clojure-only API (at least for
 now?) __double-check__ is written using
 [cljx](http://github.com/keminglabs/cljx), and thus provides an API that is
 portable between Clojure and ClojureScript.  _This approach has already
@@ -18,34 +20,38 @@ programs._
 
 Please note that this fork:
 
-1. ...always tracks simple-check as closely as possible, with the only divergences
+1. ...always tracks test.check as closely as possible, with the only divergences
 being those necessary to ensure an API portable between Clojure and
 ClojureScript.
 2. ...is not a rewrite.  The move to cljx yields minimal changes compared to the
-simple-check baseline; 100% of the core logic flows from it.  There's nothing
+test.check baseline; 100% of the core logic flows from it.  There's nothing
 novel here.
-3. ...is not hostile in any way to simple-check, @reiddraper, etc.  (It's
+3. ...is not hostile in any way to test.check, @reiddraper, etc.  (It's
 actually
 [@reiddraper-approved](https://github.com/reiddraper/simple-check/issues/11#issuecomment-31963517)!
-:-P) It exists solely to make it possible to apply simple-check's testing
+:-P) It exists solely to make it possible to apply test.check's testing
 approach to ClojureScript libraries and applications, not to supplant or compete
-with simple-check.  In particular, the core abstractions and generator/shrinking
-implementation defined in simple-check are considered canonical.  If
-simple-check eventually provides equivalent functionality for the ClojureScript
+with test.check.  In particular, the core abstractions and generator/shrinking
+implementation defined in test.check are considered canonical.  If
+test.check eventually provides equivalent functionality for the ClojureScript
 side of the house, this project will be shuttered.
-4. ...does not make any guarantees about 100% API compatibility with
-simple-check, though it is based upon and tracks it.  i.e. you should not expect
-to be able to move from simple-check to double-check (or vice versa) in a
-Clojure project with no changes.  None are known to be required right now, but
-that _may_ change to maximize runtime target portability.
-5. ...retains the `simple-check.*` namespace structure, despite the name of this
-repo. This is to make tracking easier, and to allow users to share/port examples
-and usage of each package back and forth with a minimum of pain.
+4. ...does not make any guarantees about 100% API compatibility with test.check,
+though it is based upon and tracks it.  i.e. you should not expect to be able to
+move from test.check to double-check (or vice versa) in a Clojure project with
+no changes.  Except for the (slightly) different namespaces, no changes are
+known to be required right now, but that _may_ change to maximize runtime target
+portability.
+5. ..._does not_ retain the `clojure.test.check.*` namespace structure.  The
+simple rule is, `s/clojure.test.check/cemerick.double-check/g`.  While it would
+be convenient to do so (in order to make tracking easier, and to allow users to
+share/port examples and usage of each package back and forth with a minimum of
+pain), I am personally not comfortable distributing a fork of a Clojure
+"contrib" library using the same namespaces.
 
 A word on versioning: `[com.cemerick/double-check]` version numbers will track
-simple-check version numbers as well, using a suffixed classifier (e.g. 0.1.2
+test.check version numbers as well, using a suffixed classifier (e.g. 0.1.2
 turns into 0.1.2-1) to indicate local changes.  `SNAPSHOT` version numbers will
-be the same as simple-check's.
+be the same as test.check's.
 
 ## Releases and Dependency Information
 
@@ -79,49 +85,44 @@ ClojureScript builds; this will be necessary until
 </dependency>
 ```
 
-If you'd like to try a SNAPSHOT version, [add the sonatype repository to your
-project](http://dev.clojure.org/display/community/Maven+Settings+and+Repositories).
-
-### Version numbers
-
-_test.check_ version numbers start where _simple-check_ left off: 0.5.7.
-
-
 ## Documentation
 
   * [Generator writing guide](doc/intro.md)
-  * Examples (some of these may refer to simple-check):
+  * Examples (some of these may refer to test.check):
     * [core.matrix](https://github.com/mikera/core.matrix/blob/c45ee6b551a50a509e668f46a1ae52ade2c52a82/src/test/clojure/clojure/core/matrix/properties.clj)
     * [byte-streams](https://github.com/ztellman/byte-streams/blob/b5f50a20c6237ae4e45046f72367ad658090c591/test/byte_streams_simple_check.clj)
     * [byte-transforms](https://github.com/ztellman/byte-transforms/blob/c5b9613eebac722447593530531b9aa7976a0592/test/byte_transforms_simple_check.clj)
     * [collection-check](https://github.com/ztellman/collection-check)
-  * Blog posts and videos (some of these may refer to simple-check):
+  * Blog posts and videos (some of these may refer to test.check):
     * [Check your work - 8th Light](http://blog.8thlight.com/connor-mendenhall/2013/10/31/check-your-work.html)
     * [Writing simple-check - Reid Draper](http://reiddraper.com/writing-simple-check/)
     * [Generative testing in Clojure - Youtube](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
     * [Using simple-check with Expectations - Curtis Gagliardi](http://curtis.io/posts/2013-12-28-using-simple-check-with-expectations.html)
 
-## Migrating from simple-check
+## Migrating from simple-check or test.check
 
-In order to migrate from _simple-check_ to _test.check_, you'll need to do two
+In order to migrate from _simple-check_ or _test.check_ to _double-check_, you'll need to do two
 things:
 
 * Update project.clj
 
-    In your `project.clj` replace `[reiddraper/simple-check "0.5.6"]` with
-    `[org.clojure/test.check "0.5.7"]` (note: your version numbers may be
-    different).
+    In your `project.clj` replace `[reiddraper/simple-check "$VERSION"]` or
+    `[org.clojure/test.check "$VERSION"]` with
+    `[com.cemerick/double-check "$LATEST_VERSION_HERE"]` (note: your version
+    numbers may be different).
 
 * Update namespace declarations
 
-    Update your namespaces: `simple-check.core` becomes `clojure.test.check` (note
-    the dropping of 'core'). Everything else you can simply replace `simple-check`
-    with `clojure.test.check`. Let's make it easy:
+    Update your namespaces: `simple-check.core` becomes `cemerick.double-check`
+    (note the dropping of 'core').  For all other things, just replace
+    `simple-check` or `clojure.test.check` with `cemerick.double-check`. Let's
+    make it easy:
 
     ```shell
     find test -name '*.clj' -print0 | xargs -0 sed -i.bak \
-    -e 's/simple-check.core/clojure.test.check/' \
-    -e 's/simple-check/clojure.test.check/'
+    -e 's/simple-check.core/cemerick.double-check/' \
+    -e 's/simple-check/cemerick.double-check/' \
+    -e 's/clojure.test.check/cemerick.double-check/'
     ```
 
     Review the updates.
@@ -135,11 +136,11 @@ quick test to make sure this is the case:
 
 ```clojure
 (ns double-check.demos
-  (:require [simple-check.core :as sc]
-            [simple-check.generators :as gen]
-            [simple-check.properties :as prop]))
+  (:require [cemerick.double-check.core :as sc]
+            [cemerick.double-check.generators :as gen]
+            [cemerick.double-check.properties :as prop]))
 ; in ClojureScript, the last :require would be replaced with:
-; (:require-macros [simple-check.properties :as prop])
+; (:require-macros [cemerick.double-check.properties :as prop])
 
 (def sort-idempotent-prop
   (prop/for-all [v (gen/vector gen/int)]
@@ -200,7 +201,7 @@ To learn more, check out the [documentation](#documentation) links.
 
 ### `clojure.test` Integration
 
-The `simple-check.clojure-test/defspec` macro allows you to succinctly write
+The `cemerick.double-check.clojure-test/defspec` macro allows you to succinctly write
 properties that run under `clojure.test` (or
 [clojurescript.test](http://github.com/cemerick/clojurescript.test), as
 appropriate).  For example:
@@ -223,8 +224,9 @@ See more examples in [`core_test.clj`](test/cljx/simple_check/core_test.cljx).
 ## Release Notes
 
 Release notes for each version are available in
-[`CHANGELOG.markdown`](CHANGELOG.markdown). Remember that prior to version
-0.5.7, _test.check_ was called _simple-check_.
+[`CHANGELOG.markdown`](CHANGELOG.markdown). Changes that are specific to
+double-check (i.e. that don't flow from upstream changes in test.check) are
+noted as such.
 
 ## See also...
 
