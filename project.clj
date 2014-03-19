@@ -6,7 +6,8 @@
   :source-paths ["src/clj" "src/cljx" "target/classes"]
   :test-paths ["target/test-classes"]
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [com.cemerick/pprng "0.0.2"]]
+                 [com.cemerick/pprng "0.0.2"]
+                 [com.cemerick/clojurescript.test "0.3.0"]]
   :jar-exclusions [#"\.cljx"]
   :codox {:writer codox-md.writer/write-docs}
   :plugins [[codox "0.6.4"]]
@@ -15,7 +16,7 @@
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
                    :plugins [[com.keminglabs/cljx "0.3.3-SNAPSHOT"]
                              [lein-cljsbuild "1.0.1"]
-                             [com.cemerick/clojurescript.test "0.3.0-SNAPSHOT"]
+                             [com.cemerick/clojurescript.test "0.3.0"]
                              [com.cemerick/austin "0.1.4"]]
                    :cljx {:builds [{:source-paths ["src/cljx"]
                                     :output-path "target/classes"
