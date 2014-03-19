@@ -1,10 +1,16 @@
 # Changelog
 
-0.5.7
+* 0.5.7
     * Rename project to clojure.test.check. See README for mirgrating
     from _simple-check_.
+    * **double-check specific changes**
+      * Completed big merge with upstream after the simple-check => test.check
+        migration.
+      * Namespacing chnged from `simple-check.*` to `cemerick.double-check.*`.
+        See fifth bullet in the README for why.
 
-0.5.6
+
+* 0.5.6
     * Fix `choose` bug introduced in 0.5.4, the upper-bound was not inclusive.
 
 * 0.5.5
