@@ -1,15 +1,11 @@
-This is a [Clojure contrib] project.
+This is a fork of a "[clojure
+contrib](http://dev.clojure.org/display/doc/Clojure+Contrib)" project,
+[test.check](https://github.com/clojure/test.check), which tracks upstream as
+closely as possible while maintaiing its own additional objectives.  Please see
+the README for details, motivation, etc.
 
-__We cannot accept pull requests.__
+Thus, any bugs or enhancements to core functionality very likely should be
+reported / submitted upstream.
 
-* Issues can be filed in [JIRA]. No [Clojure CA] is required for this.
-* Patches/contributions can be attached to issues in [Jira]. You can [read more
-  about that process](http://dev.clojure.org/display/community/Contributing).
-  Contributions need a [signed CA (Contributor
-  Agreement)](http://clojure.org/contributing).
-
-Don't hesitate to ask if you have questions about this.
-
-[JIRA]: http://dev.clojure.org/jira/browse/TCHECK
-[Clojure CA]: http://dev.clojure.org/display/community/Contributing
-[Clojure contrib]: http://dev.clojure.org/display/doc/Clojure+Contrib
+Contributions around the ClojureScript support of double-check _are_ very
+welcome, as are Github issues and pull requests.
