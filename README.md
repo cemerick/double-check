@@ -60,7 +60,7 @@ be the same as test.check's.
 Add this to your `:dependencies`:
 
 ```clojure
-[com.cemerick/double-check "0.5.6-SNAPSHOT"]
+[com.cemerick/double-check "0.5.7-SNAPSHOT"]
 ```
 
 ...and make sure you add this to your
@@ -81,7 +81,7 @@ ClojureScript builds; this will be necessary until
 <dependency>
   <groupId>com.cemerick</groupId>
   <artifactId>double-check</artifactId>
-  <version>0.5.6-SNAPSHOT</version>
+  <version>0.5.7-SNAPSHOT</version>
 </dependency>
 ```
 
