@@ -138,9 +138,7 @@ quick test to make sure this is the case:
 (ns double-check.demos
   (:require [cemerick.double-check.core :as sc]
             [cemerick.double-check.generators :as gen]
-            [cemerick.double-check.properties :as prop]))
-; in ClojureScript, the last :require would be replaced with:
-; (:require-macros [cemerick.double-check.properties :as prop])
+            [cemerick.double-check.properties :as prop :include-macros true]))
 
 (def sort-idempotent-prop
   (prop/for-all [v (gen/vector gen/int)]
