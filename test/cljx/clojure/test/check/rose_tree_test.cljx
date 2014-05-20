@@ -7,14 +7,14 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cemerick.double-check.rose-tree-test
-  (:require [cemerick.double-check       :as sc]
-            [cemerick.double-check.generators :as gen]
-            [cemerick.double-check.properties :as prop :refer (#+clj for-all)]
-            #+clj [cemerick.double-check.clojure-test :as ct :refer (defspec)]
+(ns clojure.test.check.rose-tree-test
+  (:require [clojure.test.check       :as sc]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop :refer (#+clj for-all)]
+            #+clj [clojure.test.check.clojure-test :as ct :refer (defspec)]
             #+clj [clojure.test :refer (is testing deftest test-var)])
-  #+cljs (:require-macros [cemerick.double-check.clojure-test :refer (defspec)]
-                          [cemerick.double-check.properties :refer (for-all)]
+  #+cljs (:require-macros [clojure.test.check.clojure-test :refer (defspec)]
+                          [clojure.test.check.properties :refer (for-all)]
                           [cemerick.cljs.test :refer (is testing deftest test-var)]))
 
 (defn depth-one-children

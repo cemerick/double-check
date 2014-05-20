@@ -7,8 +7,8 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cemerick.double-check.clojure-test
-  (:require cemerick.double-check))
+(ns clojure.test.check.clojure-test
+  (:require clojure.test.check))
 
 (def ^:dynamic *default-test-count* 100)
 
@@ -31,14 +31,14 @@
        `(let [~entry-sym (fn ~entry-sym
                             ([] (~entry-sym (or ~default-times *default-test-count*)))
                             ([times# & {:keys [seed# max-size#] :as quick-check-opts#}]
-                               (apply cemerick.double-check/quick-check
+                               (apply clojure.test.check/quick-check
                                       times#
                                       (vary-meta ~property assoc :name (str '~property))
                                       (flatten (seq quick-check-opts#)))))
               ~test-fn (fn [& [test-ctx#]]
                          (~(if (:ns &env) 'cemerick.cljs.test/with-test-ctx 'do)
                           test-ctx#
-                          (~(maybe-var (:ns &env) 'cemerick.double-check.clojure-test.runtime/assert-check)
+                          (~(maybe-var (:ns &env) 'clojure.test.check.clojure-test.runtime/assert-check)
                            (assoc (~entry-sym) :test-var (str '~name)))))]
           (do
             ; :declared metadata eliminates clojurescript warnings re: a fn

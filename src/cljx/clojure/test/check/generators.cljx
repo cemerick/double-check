@@ -7,7 +7,7 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cemerick.double-check.generators
+(ns clojure.test.check.generators
   (:require [cemerick.pprng :as pprng]
             clojure.string
             [#+clj clojure.core #+cljs cljs.core :as lang])
@@ -375,7 +375,7 @@
   "
   [coll]
   (when (empty? coll)
-    (throw (ex-info "cemerick.double-check.generators/elements called with empty collection!"
+    (throw (ex-info "clojure.test.check.generators/elements called with empty collection!"
                     {:collection coll})))
   (gen-bind (choose 0 (dec (count coll)))
             #(gen-pure (rose-fmap (partial nth coll) %))))

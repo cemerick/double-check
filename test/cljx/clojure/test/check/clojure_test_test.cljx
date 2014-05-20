@@ -7,16 +7,16 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns cemerick.double-check.clojure-test-test
-  (:require [cemerick.double-check.generators :as gen]
-            [cemerick.double-check.properties :as prop]
-            cemerick.double-check
-            [cemerick.double-check.clojure-test.runtime :as ct]
+(ns clojure.test.check.clojure-test-test
+  (:require [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop]
+            clojure.test.check
+            [clojure.test.check.clojure-test.runtime :as ct]
             #+clj [clojure.test :refer (is test-var *test-out* *report-counters* *initial-report-counters*)]
             #+cljs [cemerick.cljs.test :as t]
             #+cljs [cljs.reader :refer (read-string)]
-            #+clj [cemerick.double-check.clojure-test :refer (defspec)])
-  #+cljs (:require-macros [cemerick.double-check.clojure-test :refer (defspec)]
+            #+clj [clojure.test.check.clojure-test :refer (defspec)])
+  #+cljs (:require-macros [clojure.test.check.clojure-test :refer (defspec)]
                           [cemerick.cljs.test :refer (deftest is test-var deftesthook run-tests with-test-ctx)]))
 
 (defspec trial-counts 5000
@@ -64,7 +64,7 @@
     (let [counters #+clj (ref *initial-report-counters*) #+cljs (t/init-test-environment)
           stdout (binding [ct/*report-shrinking* true
                            ; need to keep the failure of failing-spec from affecting the
-                           ; cemerick.double-check test run
+                           ; clojure.test.check test run
                            #+clj *report-counters* #+clj counters]
                    (with-out-str
                      (binding #+clj [*test-out* *out*] #+cljs []

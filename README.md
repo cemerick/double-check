@@ -41,14 +41,11 @@ move from test.check to double-check (or vice versa) in a Clojure project with
 no changes.  Except for the (slightly) different namespaces, no changes are
 known to be required right now, but that _may_ change to maximize runtime target
 portability.
-5. ..._does not_ retain the `clojure.test.check.*` namespace structure.  The
-simple rule is, `s/clojure.test.check/cemerick.double-check/g`.  While it would
-be convenient to do so (in order to make tracking easier, and to allow users to
-share/port examples and usage of each package back and forth with a minimum of
-pain), I am personally not comfortable distributing a fork of a Clojure
-"contrib" library using the same namespaces.
+5. ...retains the `clojure.test.check.*` namespace structure, despite the name of this
+repo. This is to make tracking easier, and to allow users to share/port examples
+and usage of each package back and forth with a minimum of pain.
 
-A word on versioning: `[com.cemerick/double-check]` version numbers will track
+A word on versioning: `[com.clojure.test.check]` version numbers will track
 test.check version numbers as well, using a suffixed classifier (e.g. 0.1.2
 turns into 0.1.2-1) to indicate local changes.  `SNAPSHOT` version numbers will
 be the same as test.check's.
@@ -108,21 +105,20 @@ things:
 
     In your `project.clj` replace `[reiddraper/simple-check "$VERSION"]` or
     `[org.clojure/test.check "$VERSION"]` with
-    `[com.cemerick/double-check "$LATEST_VERSION_HERE"]` (note: your version
+    `[com.clojure.test.check "$LATEST_VERSION_HERE"]` (note: your version
     numbers may be different).
 
 * Update namespace declarations
 
-    Update your namespaces: `simple-check.core` becomes `cemerick.double-check`
-    (note the dropping of 'core').  For all other things, just replace
-    `simple-check` or `clojure.test.check` with `cemerick.double-check`. Let's
+    Update your namespaces: `simple-check.core` becomes `clojure.test.check`
+    (note the dropping of 'core'). For all other things, just replace
+    `simple-check` with `clojure.test.check`. Let's
     make it easy:
 
     ```shell
     find test -name '*.clj' -print0 | xargs -0 sed -i.bak \
-    -e 's/simple-check.core/cemerick.double-check/' \
-    -e 's/simple-check/cemerick.double-check/' \
-    -e 's/clojure.test.check/cemerick.double-check/'
+    -e 's/simple-check.core/clojure.test.check/' \
+    -e 's/simple-check/clojure.test.check/'
     ```
 
     Review the updates.
@@ -199,7 +195,7 @@ To learn more, check out the [documentation](#documentation) links.
 
 ### `clojure.test` Integration
 
-The `cemerick.double-check.clojure-test/defspec` macro allows you to succinctly write
+The `clojure.test.check.clojure-test/defspec` macro allows you to succinctly write
 properties that run under `clojure.test` (or
 [clojurescript.test](http://github.com/cemerick/clojurescript.test), as
 appropriate).  For example:
@@ -217,7 +213,7 @@ invoked directly to run only it.  Or, you can run all of the tests in a
 namespace or the entire environment with the `test-ns` and `run-all-tests`
 utility functions in clojure.test and clojurescript.test.
 
-See more examples in [`core_test.clj`](test/cljx/simple_check/core_test.cljx).
+See more examples in [`core_test.clj`](test/cljx/clojure/test/check/test.cljx).
 
 ## Release Notes
 

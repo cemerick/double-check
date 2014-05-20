@@ -1,4 +1,4 @@
-(ns cemerick.double-check.clojure-test.runtime
+(ns clojure.test.check.clojure-test.runtime
   #+clj (:require [clojure.test :refer (with-test-out is)])
   #+cljs (:require cemerick.cljs.test)
   #+cljs (:require-macros [cemerick.cljs.test :refer (with-test-out is)]))
@@ -36,16 +36,16 @@
   ([name default-times property]
    `(do
       ;; consider my shame for introducing a cyclical dependency like this...
-      ;; Don't think we'll know what the solution is until cemerick.double-check
+      ;; Don't think we'll know what the solution is until clojure.test.check
       ;; integration with another test framework is attempted.
-      (require 'cemerick.double-check)
+      (require 'clojure.test.check)
       (defn ~(vary-meta name assoc
                         ::defspec true
                         :test `#(#'assert-check (assoc (~name) :test-var (str '~name))))
         ([] (~name ~default-times))
         ([times# & {:keys [seed# max-size#] :as quick-check-opts#}]
          (apply
-           cemerick.double-check/quick-check
+           clojure.test.check/quick-check
            times#
            (vary-meta ~property assoc :name (str '~property))
            (flatten (seq quick-check-opts#))))))))
@@ -56,14 +56,14 @@
 
   * false - no reporting of trials (default)
   * a function - will be passed a clojure.test/report-style map containing
-  :cemerick.double-check/property and :cemerick.double-check/trial slots
+  :clojure.test.check/property and :clojure.test.check/trial slots
   * true - provides quickcheck-style trial reporting (dots) via
   `trial-report-dots`
 
   (Note that all reporting requires running `quick-check` within the scope of a
   clojure.test run (via `test-ns`, `test-all-vars`, etc.)
 
-  Reporting functions offered by cemerick.double-check include `trial-report-dots` and
+  Reporting functions offered by clojure.test.check include `trial-report-dots` and
   `trial-report-periodic` (which prints more verbose trial progress information
   every `*trial-report-period*` milliseconds."
   false)
