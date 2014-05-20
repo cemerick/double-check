@@ -1,4 +1,4 @@
-(defproject com.cemerick/double-check "0.5.7-SNAPSHOT"
+(defproject com.cemerick/double-check "0.5.7"
   :description "A QuickCheck inspired property-based testing library."
   :url "http://github.com/cemerick/double-check"
   :license {:name "Eclipse Public License"
@@ -34,7 +34,8 @@
                                     :output-path "target/test-classes"
                                     :rules :cljs}]}
 
-                   :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]}
+                   :aliases {"cleantest" ["do" "clean," "cljx" "once," "test," "cljsbuild" "test"]
+                             "deploy" ["do" "clean," "cljx" "once," "deploy" "clojars"]}
 
                    :cljsbuild {:test-commands {"phantom" ["phantomjs" :runner "target/testable.js"]
                                                "node" ["node" :node-runner "target/testable.js"]}
