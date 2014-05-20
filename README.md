@@ -140,7 +140,7 @@ quick test to make sure this is the case:
   (prop/for-all [v (gen/vector gen/int)]
     (= (sort v) (sort (sort v)))))
 
-(tc/quick-check 100 sort-idempotent-prop)
+(sc/quick-check 100 sort-idempotent-prop)
 ;; => {:result true, :num-tests 100, :seed 1382488326530}
 ```
 
@@ -157,7 +157,7 @@ action:
     (let [s (sort v)]
       (< (first s) (last s)))))
 
-(tc/quick-check 100 prop-sorted-first-less-than-last)
+(sc/quick-check 100 prop-sorted-first-less-than-last)
 ;; => {:result false, :failing-size 0, :num-tests 1, :fail [[3]],
        :shrunk {:total-nodes-visited 5, :depth 2, :result false,
                 :smallest [[0]]}}
@@ -176,7 +176,7 @@ passed a sequence that contains the number 42:
   (prop/for-all [v (gen/vector gen/int)]
     (not (some #{42} v))))
 
-(tc/quick-check 100 prop-no-42)
+(sc/quick-check 100 prop-no-42)
 ;; => {:result false,
        :failing-size 45,
        :num-tests 46,
