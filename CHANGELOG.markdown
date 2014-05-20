@@ -1,12 +1,23 @@
 # Changelog
 
+* 0.5.8
+    * Limit the number of retries for gen/such-that. A two-arity version is
+      provided if you need to retry more than 10 times. This should be a
+      code-smell, though.
+    * Return random seed used on test failure
+    * Fix keyword generator to conform to reader specs
+    * Correct documentation mentions of namespaces
+    * Add more detailed contributing instructions
+    * Internal: use a record internally for generators. This is meant to help
+      convey the fact that generators are opaque
+    * Extract rose-tree code into a separate namespace
+
 * 0.5.7
     * Rename project to clojure.test.check. See README for mirgrating
     from _simple-check_.
     * **double-check specific changes**
       * Completed big merge with upstream after the simple-check => test.check
         migration.
-
 
 * 0.5.6
     * Fix `choose` bug introduced in 0.5.4, the upper-bound was not inclusive.

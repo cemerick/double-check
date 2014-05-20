@@ -12,6 +12,7 @@
             [clojure.test.check.generators :as gen]
             [clojure.test.check.properties :as prop :refer (#+clj for-all)]
             [clojure.test.check.clojure-test.runtime :as ct]
+            [clojure.test.check.rose-tree :as rose]
             #+clj [clojure.test.check.clojure-test :refer (defspec)]
             #+clj [clojure.test :refer (is testing deftest test-var)]
             #+cljs [cljs.reader :refer (read-string)])
@@ -19,6 +20,18 @@
                           [clojure.test.check.properties :refer (for-all)]
                           [cemerick.cljs.test :refer (is testing deftest test-var
                                                          run-tests)]))
+
+(deftest generators-are-generators
+  (testing "generator? returns true when called with a generator"
+           (is (gen/generator? gen/int))
+           (is (gen/generator? (gen/vector gen/int)))
+           (is (gen/generator? (gen/return 5)))))
+
+(deftest values-are-not-generators
+  (testing "generator? returns false when called with a value"
+           (is (not (gen/generator? 5)))
+           (is (not (gen/generator? int)))
+           (is (not (gen/generator? [1 2 3])))))
 
 ;; plus and 0 form a monoid
 ;; ---------------------------------------------------------------------------
@@ -125,7 +138,7 @@
 
 (deftest interpose-creates-sequence-twice-the-length
   (testing
-    "Interposing a collection with a value makes it's count
+    "Interposing a collection with a value makes its count
     twice the original collection, or ones less."
     (is (:result
          (sc/quick-check 1000 (for-all [v (gen/vector gen/int)]
@@ -429,13 +442,13 @@
   (for-all [[mini maxi] range-gen
             random-seed gen/nat
             size gen/nat]
-           (let [tree (gen/call-gen
-                       (gen/choose mini maxi)
-                       (gen/random random-seed)
-                       size)]
-             (every?
-              #(and (<= mini %) (>= maxi %))
-              (gen/rose-seq tree)))))
+    (let [tree (gen/call-gen
+                 (gen/choose mini maxi)
+                 (gen/random random-seed)
+                 size)]
+      (every?
+        #(and (<= mini %) (>= maxi %))
+        (rose/seq tree)))))
 
 
 ;; rand-range copes with full range of longs as bounds
@@ -468,7 +481,7 @@
 
 (deftest rand-range-uses-inclusive-bounds
   (let [bounds [5 7]
-        rand-range (apply partial gen/rand-range (gen/random) bounds)]
+        rand-range (apply partial #+clj #'gen/rand-range #+cljs gen/rand-range (gen/random) bounds)]
     (loop [trials 0
            bounds (set bounds)]
       (cond

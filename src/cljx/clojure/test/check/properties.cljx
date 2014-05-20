@@ -10,32 +10,13 @@
 (ns clojure.test.check.properties
   (:require [clojure.test.check.generators :as gen]))
 
-;; NOTES:
-;; The fields that should be returned from each test
-;; run:
-;;
-;; pass?: boolean or nil (nil implies test was discarded)
-;; expect: boolean or (maybe?) exception
-;; values: the realized values during this test
-;;
-;;
-;; These fields could be returned:
-;;
-;; interrupted?
-;; stamp: haskell QC nomenclature for stats/values collected
-;; callbacks: maybe this is where printing/clojure.test stuff goes?
-
 (defn- apply-gen
   [function]
-  (fn [args-rose]
-    (gen/gen-pure
-      (gen/rose-fmap
-       (fn [args] (let [result (try (apply function args)
-                                    (catch #+clj Throwable #+cljs js/Error t t))]
-                     {:result result
-                      :function function
-                      :args args}))
-       args-rose))))
+  (fn [args]
+    (let [result (try (apply function args) (catch #+clj Throwable #+cljs js/Error t t))]
+      {:result result
+       :function function
+       :args args})))
 
 (defn for-all*
   "Creates a property (properties are also generators). A property
@@ -48,8 +29,9 @@
   (for-all* [gen/int gen/int] (fn [a b] (>= (+ a b) a)))
   "
   [args function]
-  (gen/gen-bind (apply gen/tuple args)
-                (apply-gen function)))
+  (gen/fmap
+    (apply-gen function)
+    (apply gen/tuple args)))
 
 (defn- binding-vars
   [bindings]

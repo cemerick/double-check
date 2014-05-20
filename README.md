@@ -90,11 +90,12 @@ ClojureScript builds; this will be necessary until
     * [byte-streams](https://github.com/ztellman/byte-streams/blob/b5f50a20c6237ae4e45046f72367ad658090c591/test/byte_streams_simple_check.clj)
     * [byte-transforms](https://github.com/ztellman/byte-transforms/blob/c5b9613eebac722447593530531b9aa7976a0592/test/byte_transforms_simple_check.clj)
     * [collection-check](https://github.com/ztellman/collection-check)
-  * Blog posts and videos (some of these may refer to test.check):
+  * Blog posts and videos (some of these may refer to simple-check):
+    * [Powerful Testing with test.check - Clojure/West](https://www.youtube.com/watch?v=JMhNINPo__g) -- [Slides](https://speakerdeck.com/reiddraper/powerful-testing-with-test-dot-check)
     * [Check your work - 8th Light](http://blog.8thlight.com/connor-mendenhall/2013/10/31/check-your-work.html)
     * [Writing simple-check - Reid Draper](http://reiddraper.com/writing-simple-check/)
     * [Generative testing in Clojure - Youtube](https://www.youtube.com/watch?v=u0TkAw8QqrQ)
-    * [Using simple-check with Expectations - Curtis Gagliardi](http://curtis.io/posts/2013-12-28-using-simple-check-with-expectations.html)
+    * [Using simple-check with Expectations - Curtis Gagliardi](http://curtis.io/posts/using-simple-check-with-expectations.html)
 
 ## Migrating from simple-check or test.check
 
@@ -105,7 +106,7 @@ things:
 
     In your `project.clj` replace `[reiddraper/simple-check "$VERSION"]` or
     `[org.clojure/test.check "$VERSION"]` with
-    `[com.clojure.test.check "$LATEST_VERSION_HERE"]` (note: your version
+    `[com.cemerick/double-check "$LATEST_VERSION_HERE"]` (note: your version
     numbers may be different).
 
 * Update namespace declarations
@@ -153,7 +154,7 @@ action:
 
 ```clojure
 (def prop-sorted-first-less-than-last
-  (prop/for-all [v (gen/such-that not-empty (gen/vector gen/int))]
+  (prop/for-all [v (gen/not-empty (gen/vector gen/int))]
     (let [s (sort v)]
       (< (first s) (last s)))))
 

@@ -10,26 +10,27 @@
 (ns clojure.test.check.rose-tree-test
   (:require [clojure.test.check       :as sc]
             [clojure.test.check.generators :as gen]
-            [clojure.test.check.properties :as prop :refer (#+clj for-all)]
+            [clojure.test.check.properties :as prop]
+            [clojure.test.check.rose-tree :as rose]
             #+clj [clojure.test.check.clojure-test :as ct :refer (defspec)]
             #+clj [clojure.test :refer (is testing deftest test-var)])
   #+cljs (:require-macros [clojure.test.check.clojure-test :refer (defspec)]
-                          [clojure.test.check.properties :refer (for-all)]
+                          [clojure.test.check.properties :as prop]
                           [cemerick.cljs.test :refer (is testing deftest test-var)]))
 
 (defn depth-one-children
   [[root children]]
-  (into [] (map gen/rose-root children)))
+  (into [] (map rose/root children)))
 
 (defn depth-one-and-two-children
   [[root children]]
   (into []
-        (concat (map gen/rose-root children)
-                (map gen/rose-root (mapcat gen/rose-children children)))))
+        (concat (map rose/root children)
+                (map rose/root (mapcat rose/children children)))))
 
 (defspec test-collapse-rose
   100
-  (for-all [i gen/int]
-           (let [tree (#+clj #'gen/int-rose-tree #+cljs gen/int-rose-tree i)]
-             (= (depth-one-and-two-children tree)
-                (depth-one-children (gen/collapse-rose tree))))))
+  (prop/for-all [i gen/int]
+                (let [tree (#+clj #'gen/int-rose-tree #+cljs gen/int-rose-tree i)]
+                  (= (depth-one-and-two-children tree)
+                     (depth-one-children (rose/collapse tree))))))

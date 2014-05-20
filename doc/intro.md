@@ -34,7 +34,7 @@ the count of the input is preserved. Our test might look like:
            (ascending? s)))))
 
 ;; test our property
-(sc/quick-check 100 property)
+(tc/quick-check 100 property)
 ;; => {:result true, :num-tests 100, :seed 1381894143051}
 ```
 
@@ -48,7 +48,7 @@ to fail. For example, the function might originally fail with input:
   (prop/for-all [v (gen/vector gen/int)]
     (ascending? v)))
 
-(sc/quick-check 100 bad-property)
+(tc/quick-check 100 bad-property)
 ;; => {:result false, :failing-size 7, :num-tests 8, :fail [[-2 4 -7 5 -2 7 -4]],
 ;; =>  :shrunk {:total-nodes-visited 19, :depth 8, :result false,
 ;; =>           :smallest [[0 -1]]}}
@@ -319,3 +319,8 @@ trees. And if we do some more sampling, we'll see that we see lots of nils as
 well. We can replace some of our calls to `one-of` with calls to `frequency`
 to start controlling the likelihood of generating different bits of our tree.
 Try playing with this yourself.
+
+---
+
+Check out [page two](generator-examples.md) for more examples of using
+generators in practice.
