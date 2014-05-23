@@ -6,18 +6,18 @@
   :source-paths ["src/clj" "src/cljx" "target/classes"]
   :test-paths ["target/test-classes"]
   :dependencies [[org.clojure/clojure "1.5.1"]
-                 [com.cemerick/pprng "0.0.2"]
-                 [com.cemerick/clojurescript.test "0.3.0"]]
+                 [com.cemerick/pprng "0.0.3-SNAPSHOT"]
+                 [com.cemerick/clojurescript.test "0.3.1"]]
   :jar-exclusions [#"\.cljx"]
   :codox {:writer codox-md.writer/write-docs}
   :plugins [[codox "0.6.4"]]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2156"]
+  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2227"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
                    :plugins [[com.keminglabs/cljx "0.3.3-SNAPSHOT"]
-                             [lein-cljsbuild "1.0.1"]
-                             [com.cemerick/clojurescript.test "0.3.0"]
-                             [com.cemerick/austin "0.1.4"]]
+                             [lein-cljsbuild "1.0.3"]
+                             [com.cemerick/clojurescript.test "0.3.1"]
+                             [com.cemerick/austin "0.1.5-SNAPSHOT"]]
                    :cljx {:builds [{:source-paths ["src/cljx"]
                                     :output-path "target/classes"
                                     :rules :clj}
@@ -41,7 +41,6 @@
                                                "node" ["node" :node-runner "target/testable.js"]}
                                :builds [{:source-paths ["target/classes" "target/test-classes"]
                                          :compiler {:output-to "target/testable.js"
-                                                    :libs [""]
                                                     ; node doesn't like source maps I guess?
                                                     ;:source-map "target/testable.js.map"
                                                     :optimizations :advanced}}]}}})
