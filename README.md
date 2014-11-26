@@ -133,9 +133,10 @@ quick test to make sure this is the case:
 
 ```clojure
 (ns double-check.demos
-  (:require [cemerick.double-check.core :as sc]
-            [cemerick.double-check.generators :as gen]
-            [cemerick.double-check.properties :as prop :include-macros true]))
+  (:require [clojure.test.check :as sc]
+            [clojure.test.check.clojure-test]
+            [clojure.test.check.generators :as gen]
+            [clojure.test.check.properties :as prop :include-macros true]))
 
 (def sort-idempotent-prop
   (prop/for-all [v (gen/vector gen/int)]
