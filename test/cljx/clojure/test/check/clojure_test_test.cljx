@@ -41,7 +41,7 @@
   [& [test-env]]
   (#+cljs with-test-ctx #+clj do
           #+cljs (t/TestContext. test-env 'clojure-test-test-hook)
-    (is (= {:test-var 'trial-counts, :result true, :num-tests 5000}
+    (is (= {:test-var "trial-counts" :result true :num-tests 5000}
            (-> (with-out-str
                  (binding #+clj [*test-out* *out*] #+cljs []
                           (test-var #+cljs test-env #'trial-counts)))

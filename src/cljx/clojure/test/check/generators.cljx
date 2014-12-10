@@ -14,7 +14,7 @@
             [#+clj clojure.core #+cljs cljs.core :as lang])
   (:refer-clojure :exclude [int vector list hash-map map keyword
                             char boolean byte bytes sequence
-                            not-empty]))
+                            shuffle not-empty symbol namespace]))
 
 ;; Generic helpers
 ;; ---------------------------------------------------------------------------
@@ -83,6 +83,7 @@
 
 (defn fmap
   [f gen]
+  (assert (generator? gen) "Second arg to fmap must be a generator")
   (gen-fmap (partial rose/fmap f) gen))
 
 
@@ -117,6 +118,7 @@
 
   "
   [generator k]
+  (assert (generator? generator) "First arg to bind must be a generator")
   (gen-bind generator (bind-helper k)))
 
 ;; Helpers
@@ -146,6 +148,7 @@
   ([generator]
    (sample generator 10))
   ([generator num-samples]
+   (assert (generator? generator) "First arg to sample must be a generator")
    (take num-samples (sample-seq generator))))
 
 
@@ -186,10 +189,12 @@
 
 (defn resize
   "Create a new generator with `size` always bound to `n`."
-  [n {gen :gen}]
-  (make-gen
-    (fn [rnd _size]
-      (gen rnd n))))
+  [n generator]
+  (assert (generator? generator) "Second arg to resize must be a generator")
+  (let [{:keys [gen]} generator]
+    (make-gen
+     (fn [rnd _size]
+       (gen rnd n)))))
 
 (defn choose
   "Create a generator that returns numbers in the range
@@ -213,6 +218,8 @@
 
   "
   [generators]
+  (assert (every? generator? generators)
+          "Arg to one-of must be a collection of generators")
   (bind (choose 0 (dec (count generators)))
         (partial nth generators)))
 
@@ -233,6 +240,9 @@
       (gen/frequency [[5 gen/int] [3 (gen/vector gen/int)] [2 gen/boolean]])
   "
   [pairs]
+  (assert (every? (fn [[x g]] (and (number? x) (generator? g)))
+                  pairs)
+          "Arg to frequency must be a list of [num generator] pairs")
   (let [total (apply + (lang/map first pairs))]
     (gen-bind (choose 1 total)
               #(pick pairs (rose/root %)))))
@@ -245,11 +255,10 @@
       (gen/elements [:foo :bar :baz])
   "
   [coll]
-  (when (empty? coll)
-    (throw (ex-info "clojure.test.check.generators/elements called with empty collection!"
-                    {:collection coll})))
-  (gen-bind (choose 0 (dec (count coll)))
-            #(gen-pure (rose/fmap (partial nth coll) %))))
+  (assert (seq coll) "elements cannot be called with an empty collection")
+  (let [v (vec coll)]
+    (gen-bind (choose 0 (dec (count v)))
+              #(gen-pure (rose/fmap v %)))))
 
 (defn- such-that-helper
   [max-tries pred gen tries-left rand-seed size]
@@ -278,11 +287,12 @@
   ([pred gen]
    (such-that pred gen 10))
   ([pred gen max-tries]
+   (assert (generator? gen) "Second arg to such-that must be a generator")
    (make-gen
      (fn [rand-seed size]
        (such-that-helper max-tries pred gen max-tries rand-seed size)))))
 
-(def not-empty
+(defn not-empty
   "Modifies a generator so that it doesn't generate empty collections.
 
   Examples:
@@ -290,13 +300,16 @@
       ;; generate a vector of booleans, but never the empty vector
       (gen/not-empty (gen/vector gen/boolean))
   "
-  (partial such-that lang/not-empty))
+  [gen]
+  (assert (generator? gen) "Arg to not-empty must be a generator")
+  (such-that lang/not-empty gen))
 
 (defn no-shrink
   "Create a new generator that is just like `gen`, except does not shrink
   at all. This can be useful when shrinking is taking a long time or is not
   applicable to the domain."
   [gen]
+  (assert (generator? gen) "Arg to no-shrink must be a generator")
   (gen-bind gen
             (fn [[root _children]]
               (gen-pure
@@ -306,6 +319,7 @@
   "Create a new generator like `gen`, but will consider nodes for shrinking
   even if their parent passes the test (up to one additional level)."
   [gen]
+  (assert (generator? gen) "Arg to shrink-2 must be a generator")
   (gen-bind gen (comp gen-pure rose/collapse)))
 
 (def boolean
@@ -325,6 +339,8 @@
       ;; =>  [3 true] [-4 false] [9 true]))
   "
   [& generators]
+  (assert (every? generator? generators)
+          "Args to tuple must be generators")
   (gen-bind (sequence gen-bind gen-pure generators)
             (fn [roses]
               (gen-pure (rose/zip lang/vector roses)))))
@@ -361,6 +377,7 @@
   "Create a generator whose elements are chosen from `gen`. The count of the
   vector will be bounded by the `size` generator parameter."
   ([generator]
+   (assert (generator? generator) "Arg to vector must be a generator")
    (gen-bind
      (sized #(choose 0 %))
      (fn [num-elements-rose]
@@ -371,8 +388,10 @@
                    (gen-pure (rose/shrink lang/vector
                                           roses)))))))
   ([generator num-elements]
+   (assert (generator? generator) "First arg to vector must be a generator")
    (apply tuple (repeat num-elements generator)))
   ([generator min-elements max-elements]
+   (assert (generator? generator) "First arg to vector must be a generator")
    (gen-bind
      (choose min-elements max-elements)
      (fn [num-elements-rose]
@@ -391,6 +410,7 @@
 (defn list
   "Like `vector`, but generators lists."
   [generator]
+  (assert (generator? generator) "First arg to list must be a generator")
   (gen-bind (sized #(choose 0 %))
             (fn [num-elements-rose]
               (gen-bind (sequence gen-bind gen-pure
@@ -399,6 +419,25 @@
                         (fn [roses]
                           (gen-pure (rose/shrink lang/list
                                                  roses)))))))
+
+(defn- swap
+  [coll [i1 i2]]
+  (assoc coll i2 (coll i1) i1 (coll i2)))
+
+(defn
+  ^{:added "0.6.0"}
+  shuffle
+  "Create a generator that generates random permutations of `coll`. Shrinks
+  toward the original collection: `coll`."
+  [coll]
+  (let [index-gen (choose 0 (dec (count coll)))]
+    (fmap (partial reduce swap coll)
+          ;; a vector of swap instructions, with count between
+          ;; zero and 2 * count. This means that the average number
+          ;; of instructions is count, which should provide sufficient
+          ;; (though perhaps not 'perfect') shuffling. This still gives us
+          ;; nice, relatively quick shrinks.
+          (vector (tuple index-gen index-gen) 0 (* 2 (count coll))))))
 
 #+clj
 (def byte
@@ -430,6 +469,8 @@
   (assert (even? (count kvs)))
   (let [ks (take-nth 2 kvs)
         vs (take-nth 2 (rest kvs))]
+    (assert (every? generator? vs)
+            "Value args to hash-map must be generators")
     (fmap (partial zipmap ks)
           (apply tuple vs))))
 
@@ -441,12 +482,19 @@
   "Generate only ascii character."
   (fmap lang/char (choose 32 126)))
 
-(def char-alpha-numeric
-  "Generate alpha-numeric characters."
+(def char-alphanumeric
+  "Generate alphanumeric characters."
   (fmap lang/char
         (one-of [(choose 48 57)
                  (choose 65 90)
                  (choose 97 122)])))
+
+(def ^{:deprecated "0.6.0"}
+  char-alpha-numeric
+  "Deprecated - use char-alphanumeric instead.
+
+  Generate alphanumeric characters."
+  char-alphanumeric)
 
 (def char-alpha
   "Generate alpha characters."
@@ -454,16 +502,16 @@
         (one-of [(choose 65 90)
                  (choose 97 122)])))
 
-(def char-symbol-special
+(def ^{:private true} char-symbol-special
   "Generate non-alphanumeric characters that can be in a symbol."
   (elements [\* \+ \! \- \_ \?]))
 
-(def char-keyword-rest
+(def ^{:private true} char-keyword-rest
   "Generate characters that can be the char following first of a keyword."
-  (frequency [[2 char-alpha-numeric]
+  (frequency [[2 char-alphanumeric]
               [1 char-symbol-special]]))
 
-(def char-keyword-first
+(def ^{:private true} char-keyword-first
   "Generate characters that can be the first char of a keyword."
   (frequency [[2 char-alpha]
               [1 char-symbol-special]]))
@@ -476,14 +524,90 @@
   "Generate ascii strings."
   (fmap clojure.string/join (vector char-ascii)))
 
-(def string-alpha-numeric
-  "Generate alpha-numeric strings."
-  (fmap clojure.string/join (vector char-alpha-numeric)))
+(def string-alphanumeric
+  "Generate alphanumeric strings."
+  (fmap clojure.string/join (vector char-alphanumeric)))
+
+(def ^{:deprecated "0.6.0"}
+  string-alpha-numeric
+  "Deprecated - use string-alphanumeric instead.
+
+  Generate alphanumeric strings."
+  string-alphanumeric)
+
+(defn- +-or---digit?
+  "Returns true if c is \\+ or \\- and d is non-nil and a digit.
+
+  Symbols that start with +3 or -2 are not readable because they look
+  like numbers."
+  [c ^Character d]
+  (lang/boolean (and d
+                     (or (= \+ c)
+                         (= \- c))
+                     #+cljs (.match d #"^[0-9]$")
+                     #+clj (Character/isDigit d))))
+
+(def ^{:private true} namespace-segment
+  "Generate the segment of a namespace."
+  (->> (tuple char-keyword-first (vector char-keyword-rest))
+       (such-that (fn [[c [d]]] (not (+-or---digit? c d))))
+       (fmap (fn [[c cs]] (clojure.string/join (cons c cs))))))
+
+(def ^{:private true} namespace
+  "Generate a namespace (or nil for no namespace)."
+  (->> (vector namespace-segment)
+       (fmap (fn [v] (when (seq v)
+                       (clojure.string/join "." v))))))
+
+(def ^{:private true} keyword-segment-rest
+  "Generate segments of a keyword (between \\:)"
+  (->> (tuple char-keyword-rest (vector char-keyword-rest))
+       (fmap (fn [[c cs]] (clojure.string/join (cons c cs))))))
+
+(def ^{:private true} keyword-segment-first
+  "Generate segments of a keyword that can be first (between \\:)"
+  (->> (tuple char-keyword-first (vector char-keyword-rest))
+       (fmap (fn [[c cs]] (clojure.string/join (cons c cs))))))
 
 (def keyword
-  "Generate keywords."
-  (->> (tuple char-keyword-first (vector char-keyword-rest))
-       (fmap (fn [[c cs]] (lang/keyword (clojure.string/join (cons c cs)))))))
+  "Generate keywords without namespaces."
+  (->> (tuple keyword-segment-first (vector keyword-segment-rest))
+       (fmap (fn [[c cs]]
+               (lang/keyword (clojure.string/join ":" (cons c cs)))))))
+
+(def
+  ^{:added "0.5.9"}
+  keyword-ns
+  "Generate keywords with optional namespaces."
+  (->> (tuple namespace char-keyword-first (vector char-keyword-rest))
+       (fmap (fn [[ns c cs]]
+               (lang/keyword ns (clojure.string/join (cons c cs)))))))
+
+(def ^{:private true} char-symbol-first
+  (frequency [[10 char-alpha]
+              [5 char-symbol-special]
+              [1 (return \.)]]))
+
+(def ^{:private true} char-symbol-rest
+  (frequency [[10 char-alphanumeric]
+              [5 char-symbol-special]
+              [1 (return \.)]]))
+
+(def symbol
+  "Generate symbols without namespaces."
+  (frequency [[100 (->> (tuple char-symbol-first (vector char-symbol-rest))
+                        (such-that (fn [[c [d]]] (not (+-or---digit? c d))))
+                        (fmap (fn [[c cs]] (lang/symbol (clojure.string/join (cons c cs))))))]
+              [1 (return '/)]]))
+
+(def
+  ^{:added "0.5.9"}
+  symbol-ns
+  "Generate symbols with optional namespaces."
+  (frequency [[100 (->> (tuple namespace char-symbol-first (vector char-symbol-rest))
+                        (such-that (fn [[_ c [d]]] (not (+-or---digit? c d))))
+                        (fmap (fn [[ns c cs]] (lang/symbol ns (clojure.string/join (cons c cs))))))]
+              [1 (return '/)]]))
 
 #+clj
 (def ratio
@@ -495,10 +619,10 @@
            (such-that (complement zero?) int))))
 
 (def simple-type
-  (one-of [int char string #+clj ratio boolean keyword]))
+  (one-of [int char string #+clj ratio boolean keyword keyword-ns symbol symbol-ns]))
 
 (def simple-type-printable
-  (one-of [int char-ascii string-ascii #+clj ratio boolean keyword]))
+  (one-of [int char-ascii string-ascii #+clj ratio boolean keyword keyword-ns symbol symbol-ns]))
 
 (defn container-type
   [inner-type]
@@ -506,20 +630,47 @@
            (list inner-type)
            (map inner-type inner-type)]))
 
-(defn sized-container
-  {:no-doc true}
-  [inner-type]
-  (fn [size]
-    (if (zero? size)
-      inner-type
-      (one-of [inner-type
-               (container-type (resize (quot size 2) (sized (sized-container inner-type))))]))))
+(defn recursive-helper
+  [container-gen-fn scalar-gen scalar-size children-size height]
+  (if (zero? height)
+    (resize scalar-size scalar-gen)
+    (resize children-size
+            (container-gen-fn
+              (recursive-helper
+                container-gen-fn scalar-gen
+                scalar-size children-size (dec height))))))
+
+(defn
+  ^{:added "0.5.9"}
+  recursive-gen
+  "This is a helper for writing recursive (tree-shaped) generators. The first
+  argument should be a function that takes a generator as an argument, and
+  produces another generator that 'contains' that generator. The vector function
+  in this namespace is a simple example. The second argument is a scalar
+  generator, like boolean. For example, to produce a tree of booleans:
+
+    (gen/recursive-gen gen/vector gen/boolean)
+
+  Vectors or maps either recurring or containing booleans or integers:
+
+    (gen/recursive-gen (fn [inner] (gen/one-of [(gen/vector inner)
+                                                (gen/map inner inner)]))
+                       (gen/one-of [gen/boolean gen/int]))
+  "
+  [container-gen-fn scalar-gen]
+  (assert (generator? scalar-gen)
+          "Second arg to recursive-gen must be a generator")
+  (sized (fn [size]
+           (bind (choose 1 5)
+                 (fn [height] (let [children-size (Math/pow size (/ 1 height))]
+                                (recursive-helper container-gen-fn scalar-gen size
+                                                  children-size height)))))))
 
 (def any
   "A recursive generator that will generate many different, often nested, values"
-  (sized (sized-container simple-type)))
+  (recursive-gen container-type simple-type))
 
 (def any-printable
   "Like any, but avoids characters that the shell will interpret as actions,
   like 7 and 14 (bell and alternate character set command)"
-  (sized (sized-container simple-type-printable)))
+  (recursive-gen container-type simple-type-printable))

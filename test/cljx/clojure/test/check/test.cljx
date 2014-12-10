@@ -165,19 +165,20 @@
 ;; keyword->string->keyword roundtrip
 ;; ---------------------------------------------------------------------------
 
-(def keyword->string->keyword (comp keyword clojure.string/join rest str))
+(def keyword->string->keyword (comp keyword #(subs % 1) str))
 
 (defn keyword-string-roundtrip-equiv
   [k]
   (= k (keyword->string->keyword k)))
 
+; this is *extremely* slow in ClojureScript, don't get impatient
 (deftest keyword-string-roundtrip
   (testing
     "For all keywords, turning them into a string and back is equivalent
     to the original string (save for the `:` bit)"
     (is (:result
           (sc/quick-check 1000 (prop/for-all*
-                                [gen/keyword] keyword-string-roundtrip-equiv))))))
+                                 [gen/keyword] keyword-string-roundtrip-equiv))))))
 
 ;; Boolean and/or
 ;; ---------------------------------------------------------------------------
@@ -267,6 +268,7 @@
                (:result (sc/quick-check 100 (for-all [x generator]
                                                      (predicate x)))))]
 
+
     (testing "keyword"              (pred gen/keyword keyword?))
     #+clj (testing "ratio"                (t gen/ratio   clojure.lang.Ratio))
     #+clj (testing "byte"                 (t gen/byte    Byte))
@@ -274,10 +276,10 @@
 
     (testing "char"                 (t gen/char                 #+clj Character #+cljs js/String))
     (testing "char-ascii"           (t gen/char-ascii           #+clj Character #+cljs js/String))
-    (testing "char-alpha-numeric"   (t gen/char-alpha-numeric   #+clj Character #+cljs js/String))
+    (testing "char-alphanumeric"    (t gen/char-alphanumeric    #+clj Character #+cljs js/String))
     (testing "string"               (pred gen/string               string?))
     (testing "string-ascii"         (pred gen/string-ascii         string?))
-    (testing "string-alpha-numeric" (pred gen/string-alpha-numeric string?))
+    (testing "string-alphanumeric"  (pred gen/string-alphanumeric  string?))
 
     (testing "vector" (pred (gen/vector gen/int) vector?))
     (testing "list"   (pred (gen/list gen/int)   list?))
@@ -420,14 +422,15 @@
                     (= (:fail result)
                        (-> result :shrunk :smallest))))))
 
-;; elements throws a helpful exception when called on an empty collection
+;; elements works with a variety of input
 ;; ---------------------------------------------------------------------------
 
 (deftest elements-with-empty
-  (let [t (is (thrown? #+clj clojure.lang.ExceptionInfo
-                       #+cljs cljs.core.ExceptionInfo
-                       (gen/elements ())))]
-    (is (= () (-> t ex-data :collection)))))
+  (is (thrown? #+clj AssertionError #+cljs js/Error (gen/elements ()))))
+
+(defspec elements-with-a-set 100
+  (for-all [num (gen/elements #{9 10 11 12})]
+    (<= 9 num 12)))
 
 
 ;; choose respects bounds during shrinking
@@ -505,3 +508,38 @@
              "it is possible for this to fail without there being a problem, "
              "but we should be able to rely upon probability to not bother us "
              "too frequently."))))
+
+;; shuffling a vector generates a permutation of that vector
+;; ---------------------------------------------------------------------------
+
+(def original-vector-and-permutation
+  (gen/bind (gen/vector gen/int)
+        #(gen/tuple (gen/return %) (gen/shuffle %))))
+
+(defspec shuffled-vector-is-a-permutation-of-original 100
+  (for-all [[coll permutation] original-vector-and-permutation]
+                (= (sort coll) (sort permutation))))
+
+;; defspec macro
+;; ---------------------------------------------------------------------------
+
+(defspec run-only-once 1 (prop/for-all* [gen/int] (constantly true)))
+
+(defspec run-default-times (prop/for-all* [gen/int] (constantly true)))
+
+(defspec run-with-map1 {:num-tests 1} (prop/for-all* [gen/int] (constantly true)))
+
+(defspec run-with-map {:num-tests 1
+                       :seed 1}
+  (for-all [a gen/int]
+                (= a 0)))
+
+(def my-defspec-options {:num-tests 1 :seed 1})
+
+(defspec run-with-symbolic-options my-defspec-options
+  (for-all [a gen/int]
+                (= a 0)))
+
+(defspec run-with-no-options
+  (for-all [a gen/int]
+                (integer? a)))

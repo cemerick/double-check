@@ -57,20 +57,8 @@ be the same as test.check's.
 Add this to your `:dependencies`:
 
 ```clojure
-[com.cemerick/double-check "0.5.7"]
+[com.cemerick/double-check "0.6.1"]
 ```
-
-...and make sure you add this to your
-[cljsbuild](https://github.com/emezeske/lein-cljsbuild) `:compiler` options:
-
-```clojure
-:libs [""]
-```
-
-(This is temporary workaround will bring in the JavaScript portion of the
-[portable random number generator](http://github.com/cemerick/pprng) for your
-ClojureScript builds; this will be necessary until
-[CLJS-656](http://dev.clojure.org/jira/browse/CLJS-656) is resolved.)
 
 ### Maven
 
@@ -78,12 +66,13 @@ ClojureScript builds; this will be necessary until
 <dependency>
   <groupId>com.cemerick</groupId>
   <artifactId>double-check</artifactId>
-  <version>0.5.7</version>
+  <version>0.6.1</version>
 </dependency>
 ```
 
 ## Documentation
 
+  * [API Docs](http://clojure.github.io/test.check/)
   * [Generator writing guide](doc/intro.md)
   * Examples (some of these may refer to test.check):
     * [core.matrix](https://github.com/mikera/core.matrix/blob/c45ee6b551a50a509e668f46a1ae52ade2c52a82/src/test/clojure/clojure/core/matrix/properties.clj)
@@ -126,10 +115,10 @@ things:
 
 ## Examples
 
-Let's say we're testing a sort function. We want want to check that that our
-sort function is idempotent, that is, applying sort twice should be
-equivalent to applying it once: `(= (sort a) (sort (sort a)))`. Let's write a
-quick test to make sure this is the case:
+Let's say we're testing a sort function. We want to check that that our sort
+function is idempotent, that is, applying sort twice should be equivalent to
+applying it once: `(= (sort a) (sort (sort a)))`. Let's write a quick test to
+make sure this is the case:
 
 ```clojure
 (ns double-check.demos
@@ -204,9 +193,9 @@ appropriate).  For example:
 ```clojure
 (defspec first-element-is-min-after-sorting ;; the name of the test
          100 ;; the number of iterations for test.check to test
-         (prop/for-all [v (such-that not-empty (gen/vector gen/int))]
+         (prop/for-all [v (gen/not-empty (gen/vector gen/int))]
            (= (apply min v)
-              (first (sorted v)))))
+              (first (sort v)))))
 ```
 
 This defines a standard clojure.test / clojurescript.test test, which can be
