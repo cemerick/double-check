@@ -14,7 +14,7 @@
 
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2411"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
-                   :plugins [[com.keminglabs/cljx "0.3.3-SNAPSHOT"]
+                   :plugins [[com.keminglabs/cljx "0.5.0"]
                              [lein-cljsbuild "1.0.3"]
                              [com.cemerick/clojurescript.test "0.3.1"]
                              [com.cemerick/austin "0.1.5-SNAPSHOT"]]
