@@ -12,7 +12,7 @@
   :codox {:defaults {:doc/format :markdown}}
   :plugins [[codox "0.8.10"]]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2227"]
+  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-2411"]
                                   [codox-md "0.2.0" :exclusions [org.clojure/clojure]]]
                    :plugins [[com.keminglabs/cljx "0.3.3-SNAPSHOT"]
                              [lein-cljsbuild "1.0.3"]
@@ -41,6 +41,4 @@
                                                "node" ["node" :node-runner "target/testable.js"]}
                                :builds [{:source-paths ["target/classes" "target/test-classes"]
                                          :compiler {:output-to "target/testable.js"
-                                                    ; node doesn't like source maps I guess?
-                                                    ;:source-map "target/testable.js.map"
                                                     :optimizations :advanced}}]}}})
