@@ -21,6 +21,9 @@
                           [cemerick.cljs.test :refer (is testing deftest test-var
                                                          run-tests)]))
 
+#+clj (.doReset #'ct/*report-trials* ct/trial-report-periodic)
+#+cljs (set! ct/*report-trials* ct/trial-report-periodic)
+
 (deftest generators-are-generators
   (testing "generator? returns true when called with a generator"
            (is (gen/generator? gen/int))

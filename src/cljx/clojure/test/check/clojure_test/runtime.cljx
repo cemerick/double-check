@@ -101,7 +101,8 @@
                                   (if (true? *report-trials*)
                                     trial-report-dots
                                     *report-trials*))]
-    (trial-report-fn m)))
+    (trial-report-fn (merge m #+cljs (or cemerick.cljs.test/*test-ctx*
+                                       {:test-env (atom nil)})))))
 
 (defmethod ct-report ::shrinking [m]
   (when *report-shrinking*
