@@ -7,6 +7,7 @@
 	  * added support for JavaScript binary data:
 	    * `clojure.test.check.generators/bytes` generates `Uint8Array`s
 		* `clojure.test.check.generators/byte` generates numbers [0-255].
+      * Fixed trial reporting under ClojureScript
 * 0.6.0
     * Add a `shuffle` generator, which generates permutations of a given
       sequence.
