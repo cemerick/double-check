@@ -45,10 +45,10 @@ portability.
 repo. This is to make tracking easier, and to allow users to share/port examples
 and usage of each package back and forth with a minimum of pain.
 
-A word on versioning: `[com.clojure.test.check]` version numbers will track
-test.check version numbers as well, using a suffixed classifier (e.g. 0.1.2
-turns into 0.1.2-1) to indicate local changes.  `SNAPSHOT` version numbers will
-be the same as test.check's.
+A word on versioning: version numbers will track test.check version numbers as
+well, using a suffixed classifier (e.g. 0.1.2 turns into 0.1.2-1) to indicate
+local changes made in between test.check releases.  `SNAPSHOT` version numbers
+will be the same as test.check's.
 
 ## Releases and Dependency Information
 
