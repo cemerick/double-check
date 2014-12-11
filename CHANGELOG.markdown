@@ -3,6 +3,10 @@
 * 0.6.1
     * Fix bug introduced in 0.6.0: The `defspec` macro could only accept map or
       numberic _literals_ as options, instead of a symbol.
+	* **double-check specific changes**
+	  * added support for JavaScript binary data:
+	    * `clojure.test.check.generators/bytes` generates `Uint8Array`s
+		* `clojure.test.check.generators/byte` generates numbers [0-255].
 * 0.6.0
     * Add a `shuffle` generator, which generates permutations of a given
       sequence.

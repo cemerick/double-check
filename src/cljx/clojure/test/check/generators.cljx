@@ -439,15 +439,25 @@
           ;; nice, relatively quick shrinks.
           (vector (tuple index-gen index-gen) 0 (* 2 (count coll))))))
 
-#+clj
 (def byte
-  "Generates `java.lang.Byte`s, using the full byte-range."
-  (fmap lang/byte (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
+  #+clj "Generates `java.lang.Byte`s, using the full byte-range."
+  #+cljs   "Generates integer `Number`s [0-255]."
+  (fmap lang/byte
+    #+cljs (choose 0 255)
+    #+clj (choose Byte/MIN_VALUE Byte/MAX_VALUE)))
 
-#+clj
+; TODO this could be so much faster, repurpose gen/vector to create and populate
+; the array directly instead of putting bytes into a vector first
 (def bytes
   "Generates byte-arrays."
-  (fmap lang/byte-array (vector byte)))
+  (fmap
+    #+clj lang/byte-array
+    #+cljs (fn [bytes]
+             (let [array (js/Uint8Array. (count bytes))]
+               (dotimes [i (count bytes)]
+                 (aset array i (nth bytes i)))
+               array))
+    (vector byte)))
 
 (defn map
   "Create a generator that generates maps, with keys chosen from

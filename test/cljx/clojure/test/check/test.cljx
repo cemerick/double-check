@@ -274,8 +274,11 @@
 
     (testing "keyword"              (pred gen/keyword keyword?))
     #+clj (testing "ratio"                (t gen/ratio   clojure.lang.Ratio))
-    #+clj (testing "byte"                 (t gen/byte    Byte))
-    #+clj (testing "bytes"                (t gen/bytes   (Class/forName "[B")))
+    (testing "byte"                 (pred gen/byte
+                                      #+cljs #(and (= js/Number (type %))
+                                                (<= 0 % 255))
+                                      #+clj #(instance? Byte %)))
+    (testing "bytes"                (t gen/bytes #+clj (Class/forName "[B") #+cljs js/Uint8Array))
 
     (testing "char"                 (t gen/char                 #+clj Character #+cljs js/String))
     (testing "char-ascii"           (t gen/char-ascii           #+clj Character #+cljs js/String))
