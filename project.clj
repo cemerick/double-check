@@ -6,7 +6,7 @@
   :source-paths ["src/clj" "src/cljx" "target/classes"]
   :test-paths ["target/test-classes"]
   :dependencies [[org.clojure/clojure "1.6.0"]
-                 [com.cemerick/pprng "0.0.3-SNAPSHOT"]
+                 [com.cemerick/pprng "0.0.3"]
                  [com.cemerick/clojurescript.test "0.3.1"]]
   :jar-exclusions [#"\.cljx"]
   :codox {:defaults {:doc/format :markdown}}
