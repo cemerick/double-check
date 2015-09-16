@@ -1,5 +1,11 @@
 # double-check [![Build Status](https://secure.travis-ci.org/cemerick/double-check.png)](http://travis-ci.org/cemerick/double-check)
 
+<h2 style="font-size:300%;font-weight:bold">DEPRECATED</h2>
+
+I strongly suggest migrating to use [test.check](https://github.com/clojure/test.check), which now provides Clojure _and_ ClojureScript APIs. Thanks to all contributors for helping with this stopgap until test.check made that transition.
+
+--------
+
 __double-check__ is a fork of [@reiddraper](http://github.com/reiddraper)'s
 [test.check](https://github.com/clojure/test.check) (née
 [simple-check](https://github.com/reiddraper/simple-check)) library, a
